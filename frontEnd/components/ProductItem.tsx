@@ -1,6 +1,12 @@
-// components/ProductItem.tsx
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 // Định nghĩa type cho Product
@@ -15,9 +21,10 @@ type Product = {
 interface ProductItemProps {
   product: Product;
   isFavorite: boolean;
-  onPress: (productId: string) => void; // Thay đổi từ product sang productId
-  onToggleFavorite: () => void;
-  isSelected?: boolean; // Optional, mặc định là false
+  onPress: (productId: string) => void;
+  onToggleFavorite: (productId: string) => void; // Chỉ truyền productId
+  isSelected?: boolean;
+  userId: string; // userId là bắt buộc để gọi API Wishlist
 }
 
 // Hằng số cho style
@@ -45,9 +52,37 @@ const ProductItem: React.FC<ProductItemProps> = ({
   onPress,
   onToggleFavorite,
   isSelected = false,
+  userId,
 }) => {
   // Hàm định dạng giá tiền
-  const formatPrice = (price: number) => `${price} Vnd`; // Có thể thay bằng VNĐ nếu cần
+  const formatPrice = (price: number) => `${price.toLocaleString()} Vnd`;
+
+  // Hàm gọi API Wishlist
+  const handleToggleFavorite = async () => {
+    try {
+      const url = isFavorite
+        ? `http://10.0.2.2:5001/wishlists/remove`
+        : `http://10.0.2.2:5001/wishlists/add`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          productId: product._id,
+        }),
+      });
+
+      if (response.ok) {
+        onToggleFavorite(product._id); // Gọi hàm từ parent để cập nhật trạng thái
+      } else {
+        Alert.alert("Lỗi", "Không thể cập nhật Wishlist");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi gọi API");
+    }
+  };
 
   return (
     <TouchableOpacity onPress={() => onPress(product._id)}>
@@ -55,7 +90,7 @@ const ProductItem: React.FC<ProductItemProps> = ({
         {/* Nút yêu thích */}
         <TouchableOpacity
           style={styles.wishlistButton}
-          onPress={onToggleFavorite}
+          onPress={handleToggleFavorite}
         >
           <Icon
             name={isFavorite ? "favorite" : "favorite-border"}
@@ -90,13 +125,13 @@ const ProductItem: React.FC<ProductItemProps> = ({
 
 const styles = StyleSheet.create({
   productItem: {
-    width: 220,
-    height: 340,
+    width: 220, // Giảm chiều rộng để hiển thị tốt hơn trong FlatList 2 cột
+    height: 300,
     backgroundColor: COLORS.white,
     borderRadius: SIZES.borderRadius,
     padding: SIZES.padding,
-    marginHorizontal: 10,
-    marginTop: 20,
+    marginHorizontal: 5,
+    marginTop: 10,
     borderWidth: 1,
     borderColor: COLORS.gray,
     shadowColor: COLORS.black,
@@ -116,8 +151,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   productImage: {
-    width: "100%",
-    height: 200,
+    width: "80%",
+    height: 150,
+    alignSelf: "center",
     borderRadius: SIZES.borderRadius - 2,
   },
   productName: {

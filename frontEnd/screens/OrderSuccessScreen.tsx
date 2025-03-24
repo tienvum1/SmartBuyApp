@@ -27,7 +27,7 @@ const OrderSuccessScreen = ({ navigation }: { navigation: any }) => {
           >
             <Text
               style={styles.buttonText}
-              onPress={() => navigation.navigate("OrderDetailScreen")}
+              onPress={() => navigation.navigate("OrderScreen")}
             >
               View Order Details
             </Text>

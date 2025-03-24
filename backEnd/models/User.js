@@ -8,7 +8,8 @@ const UserSchema = new mongoose.Schema({
   status: { type: String, default: "active" },
   phone: {
     type: String,
-    default: "0123456789",
+    sparse: true,
+    default: "null",
   },
   address: [
     {

@@ -21,7 +21,7 @@ const BottomNavigationBar = ({ navigation }: { navigation: any }) => {
         style={styles.iconContainer}
         onPress={() => navigation.navigate("OrderScreen")}
       >
-        <Icon name="assignment" size={30} color="black" />
+        <Icon name="description" size={30} color="black" />
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}

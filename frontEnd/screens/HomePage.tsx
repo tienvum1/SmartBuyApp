@@ -1,4 +1,3 @@
-// Import các thư viện và thành phần cần thiết
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -10,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import các component tùy chỉnh
 import BottomNavigationBar from "../components/BottomNavigationBar";
@@ -22,8 +22,8 @@ const COLORS = {
   black: "#1A1A1A",
   darkGray: "#333",
   gray: "#A0A0A0",
-  primary: "#6B48FF", // Màu tím đậm hiện đại
-  secondary: "#E6E6FA", // Màu tím nhạt
+  primary: "#6B48FF",
+  secondary: "#E6E6FA",
 };
 
 const SIZES = {
@@ -68,17 +68,39 @@ const SectionHeader = ({
 );
 
 // Component chính: HomeScreen
-const HomeScreen = ({ navigation }: { navigation: any }) => {
-  // State quản lý dữ liệu
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
+  const [user, setUser] = useState<any>(null); // Lưu thông tin user từ AsyncStorage
   const [brands, setBrands] = useState<Brand[]>([]);
   const [topSellingProducts, setTopSellingProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true); // Trạng thái loading
 
-  // Fetch dữ liệu từ API khi component mount
+  // Lấy dữ liệu user từ AsyncStorage khi component mount
   useEffect(() => {
-    fetchData();
-  }, []);
+    const initializeData = async () => {
+      try {
+        // Lấy user từ route.params nếu có, nếu không thì từ AsyncStorage
+        const userFromParams = route.params?.user;
+        if (userFromParams) {
+          setUser(userFromParams);
+        } else {
+          const storedUser = await AsyncStorage.getItem("user");
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+        }
+        // Fetch dữ liệu khác
+        await fetchData();
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, [route.params?.user]); // Theo dõi route.params.user để cập nhật nếu có thay đổi
 
   const fetchData = async () => {
     try {
@@ -100,6 +122,19 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     navigation.navigate("DetailProduct", { productId });
   };
 
+  // Xử lý toggle favorite
+  const handleToggleFavorite = (productId: string) => {
+    setFavorites((prev) => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(productId)) {
+        newFavorites.delete(productId);
+      } else {
+        newFavorites.add(productId);
+      }
+      return newFavorites;
+    });
+  };
+
   // Component: Header
   const Header = () => (
     <View style={styles.header}>
@@ -107,7 +142,11 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         onPress={() => navigation.navigate("OrderDetailScreen")}
       >
         <Image
-          source={require("../assets/images/avatar.jpeg")}
+          source={
+            user?.avatar
+              ? { uri: user.avatar }
+              : require("../assets/images/avatar.jpeg")
+          }
           style={styles.avatar}
         />
       </TouchableOpacity>
@@ -159,9 +198,10 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         renderItem={({ item }) => (
           <ProductItem
             product={item}
-            isFavorite={isFavorite}
-            onPress={() => handleProductPress(item._id)}
-            onToggleFavorite={() => setIsFavorite(!isFavorite)}
+            isFavorite={favorites.has(item._id)}
+            onPress={handleProductPress}
+            onToggleFavorite={handleToggleFavorite}
+            userId={user?._id || "default-user-id"} // Sử dụng user._id từ AsyncStorage
           />
         )}
         contentContainerStyle={styles.productList}
@@ -170,9 +210,18 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
   );
 
   // Render giao diện chính
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Đang tải...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Header />
+      <Text>User ID: {user?._id || "Chưa đăng nhập"}</Text>
       <FlatList
         data={[]}
         keyExtractor={(item, index) => index.toString()}
@@ -194,7 +243,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
   );
 };
 
-// Styles
+// Styles (giữ nguyên như code gốc)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -202,9 +251,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: SIZES.padding,
-    paddingBottom: 80, // Để không bị che bởi BottomNavigationBar
+    paddingBottom: 80,
   },
-  // Header styles
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -234,7 +282,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // Section Header styles
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -251,7 +298,6 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontWeight: "500",
   },
-  // Category styles
   categoryListContainer: {
     marginVertical: 10,
   },
@@ -285,7 +331,6 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     textAlign: "center",
   },
-  // Product List styles
   productList: {
     paddingVertical: SIZES.padding,
   },

@@ -67,7 +67,7 @@ const ProductScreen = ({
   navigation: any;
   route: any;
 }) => {
-  const { query } = route.params || {};
+  const { query, userId = "default-user-id" } = route.params || {}; // userId mặc định nếu không truyền
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -165,7 +165,6 @@ const ProductScreen = ({
   // Render filter buttons
   const renderFilterButtons = () => (
     <View style={styles.filterContainer}>
-      {/* Price Filter */}
       <View style={styles.filterWrapper}>
         <TouchableOpacity
           style={styles.filterButton}
@@ -199,7 +198,6 @@ const ProductScreen = ({
         )}
       </View>
 
-      {/* Sort Filter */}
       <View style={styles.filterWrapper}>
         <TouchableOpacity
           style={[styles.filterButton, styles.sortButton]}
@@ -259,9 +257,10 @@ const ProductScreen = ({
                 images: item.images,
               }}
               isFavorite={favorites.has(item._id)}
-              onPress={() => handleProductPress(item._id)}
-              onToggleFavorite={() => handleToggleFavorite(item._id)}
+              onPress={handleProductPress}
+              onToggleFavorite={handleToggleFavorite}
               isSelected={selectedProduct === item._id}
+              userId={userId} // Truyền userId vào ProductItem
             />
           )}
           showsVerticalScrollIndicator={false}
