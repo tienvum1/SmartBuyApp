@@ -12,6 +12,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
 import { Ionicons } from "@expo/vector-icons";
+import BottomNavigationBar from "../components/BottomNavigationBar";
 
 interface OrderItem {
   product_id: { _id: string; name: string };
@@ -314,9 +315,7 @@ const OrdersScreen = ({
           scrollEnabled={false}
         />
         <View style={styles.actions}>
-          {["pending", "confirmed", "shipped"].includes(
-            item.status
-          ) && (
+          {["pending", "confirmed", "shipped"].includes(item.status) && (
             <TouchableOpacity
               style={[styles.actionButton, styles.cancelButton]}
               onPress={() => cancelOrder(item.orderId)}
@@ -424,6 +423,7 @@ const OrdersScreen = ({
           }}
         />
       )}
+      <BottomNavigationBar navigation={navigation} />
     </View>
   );
 };

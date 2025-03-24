@@ -1,4 +1,3 @@
-// screens/OrderDetailScreen.tsx
 import React from "react";
 import {
   View,
@@ -6,7 +5,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  ScrollView, // Thêm ScrollView
+  ScrollView,
 } from "react-native";
 import { Card, Divider } from "react-native-paper";
 import BottomNavigationBar from "../components/BottomNavigationBar";
@@ -113,7 +112,7 @@ const OrderDetailScreen = ({
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate("OrderScreen")}>
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>Order #{order.orderId}</Text>
