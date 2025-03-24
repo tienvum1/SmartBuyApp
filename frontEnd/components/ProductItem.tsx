@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
@@ -22,9 +23,9 @@ interface ProductItemProps {
   product: Product;
   isFavorite: boolean;
   onPress: (productId: string) => void;
-  onToggleFavorite: (productId: string) => void; // Chỉ truyền productId
+  onToggleFavorite: (productId: string) => void;
   isSelected?: boolean;
-  userId: string; // userId là bắt buộc để gọi API Wishlist
+  userId: string;
 }
 
 // Hằng số cho style
@@ -54,33 +55,90 @@ const ProductItem: React.FC<ProductItemProps> = ({
   isSelected = false,
   userId,
 }) => {
-  // Hàm định dạng giá tiền
-  const formatPrice = (price: number) => `${price.toLocaleString()} Vnd`;
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Hàm gọi API Wishlist
+  // Hàm định dạng giá tiền
+  const formatPrice = (price: number): string => {
+    return `${price.toLocaleString()} Vnd`;
+  };
+
+  // Hàm gọi API để thêm hoặc xóa sản phẩm khỏi Wishlist
   const handleToggleFavorite = async () => {
+    if (isLoading) return;
+
+    if (!userId || userId === "default-user-id") {
+      Alert.alert("Thông báo", "Vui lòng đăng nhập để sử dụng tính năng này!");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const url = isFavorite
-        ? `http://10.0.2.2:5001/wishlists/remove`
-        : `http://10.0.2.2:5001/wishlists/add`;
+        ? "http://10.0.2.2:5001/wishlists/remove"
+        : "http://10.0.2.2:5001/wishlists/add";
+
+      console.log(`Calling API: ${url}, isFavorite: ${isFavorite}`);
 
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           userId,
           productId: product._id,
         }),
       });
 
-      if (response.ok) {
-        onToggleFavorite(product._id); // Gọi hàm từ parent để cập nhật trạng thái
+      // Kiểm tra Content-Type của phản hồi
+      const contentType = response.headers.get("content-type");
+      console.log("Content-Type:", contentType);
+
+      if (!contentType || !contentType.includes("application/json")) {
+        // Nếu không phải JSON, log toàn bộ phản hồi để debug
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error("Server did not return JSON");
+      }
+
+      const responseData = await response.json();
+      console.log("Response from server:", responseData);
+
+      if (response.ok && responseData.success) {
+        onToggleFavorite(product._id);
+        console.log(
+          `Successfully ${isFavorite ? "removed from" : "added to"} Wishlist`
+        );
+      } else if (
+        response.status === 400 &&
+        responseData.message === "Sản phẩm không có trong Wishlist!"
+      ) {
+        if (isFavorite) {
+          onToggleFavorite(product._id);
+          console.log("Synchronized client state: removed from favorites");
+        }
+        Alert.alert("Thông báo", responseData.message);
+      } else if (
+        response.status === 400 &&
+        responseData.message === "Sản phẩm đã có trong Wishlist!"
+      ) {
+        if (!isFavorite) {
+          onToggleFavorite(product._id);
+          console.log("Synchronized client state: added to favorites");
+        }
+        Alert.alert("Thông báo", responseData.message);
       } else {
-        Alert.alert("Lỗi", "Không thể cập nhật Wishlist");
+        Alert.alert(
+          "Lỗi",
+          responseData.message || "Không thể cập nhật Wishlist"
+        );
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert("Lỗi", "Có lỗi xảy ra khi gọi API");
+      console.error("Network Error:", error);
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi kết nối đến server");
+    } finally {
+      setIsLoading(false);
+      console.log("Finished API call, isLoading set to false");
     }
   };
 
@@ -91,12 +149,17 @@ const ProductItem: React.FC<ProductItemProps> = ({
         <TouchableOpacity
           style={styles.wishlistButton}
           onPress={handleToggleFavorite}
+          disabled={isLoading}
         >
-          <Icon
-            name={isFavorite ? "favorite" : "favorite-border"}
-            size={SIZES.iconSize}
-            color={isFavorite ? COLORS.red : COLORS.darkGray}
-          />
+          {isLoading ? (
+            <ActivityIndicator size="small" color={COLORS.darkGray} />
+          ) : (
+            <Icon
+              name={isFavorite ? "favorite" : "favorite-border"}
+              size={SIZES.iconSize}
+              color={isFavorite ? COLORS.red : COLORS.darkGray}
+            />
+          )}
         </TouchableOpacity>
 
         {/* Hình ảnh sản phẩm */}
@@ -123,9 +186,10 @@ const ProductItem: React.FC<ProductItemProps> = ({
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   productItem: {
-    width: 220, // Giảm chiều rộng để hiển thị tốt hơn trong FlatList 2 cột
+    width: 220,
     height: 300,
     backgroundColor: COLORS.white,
     borderRadius: SIZES.borderRadius,

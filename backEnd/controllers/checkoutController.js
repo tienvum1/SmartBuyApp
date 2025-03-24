@@ -9,7 +9,7 @@ exports.placeOrder = async (req, res) => {
   try {
     const { shippingAddressId, paymentMethod, selectedItemIds, total, userId } =
       req.body;
-
+    console.log(req.body);
     console.log("User ID from placeOrder:", userId);
     console.log("Thông tin đầu vào:", {
       shippingAddressId,
@@ -134,7 +134,7 @@ exports.placeOrder = async (req, res) => {
       user_id: userId,
       items: orderItems,
       shipping_address: {
-        telephone: shippingAddress.telephone,
+        phone: shippingAddress.phone,
         address: shippingAddress.address,
       },
       payment_method: "cod",
@@ -169,7 +169,7 @@ exports.placeOrder = async (req, res) => {
         tax,
         total,
         shippingAddress: {
-          telephone: shippingAddress.telephone,
+          phone: shippingAddress.phone,
           address: shippingAddress.address,
         },
         paymentMethod: "cod",
@@ -268,6 +268,7 @@ exports.getOrdersByStatus = async (req, res) => {
 
     const validStatuses = [
       "pending",
+      "processing",
       "confirmed",
       "shipped",
       "out_for_delivery",
@@ -553,7 +554,7 @@ exports.getAllAddresses = async (req, res) => {
 
 exports.addShippingAddress = async (req, res) => {
   try {
-    const { telephone, address, is_primary, userId } = req.body;
+    const { phone, address, is_primary, userId } = req.body;
 
     if (!userId) {
       return res.status(400).json({
@@ -569,15 +570,15 @@ exports.addShippingAddress = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    if (!telephone || !address) {
+    if (!phone || !address) {
       return res.status(400).json({
         success: false,
-        message: "Telephone and address are required",
+        message: "phone and address are required",
       });
     }
 
     const newAddress = {
-      telephone,
+      phone,
       address,
       is_primary: is_primary || false,
     };

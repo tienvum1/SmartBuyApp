@@ -1,5 +1,19 @@
 const mongoose = require("mongoose");
 
+const AddressSchema = new mongoose.Schema(
+  {
+    address: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: true, timestamps: false } // Đảm bảo mỗi địa chỉ có _id riêng, không cần timestamps cho subdocument
+);
+
 const UserSchema = new mongoose.Schema({
   full_name: String,
   email: { type: String, unique: true },
@@ -11,16 +25,7 @@ const UserSchema = new mongoose.Schema({
     sparse: true,
     default: "null",
   },
-  address: [
-    {
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
-      telephone: String,
-      address: String,
-      is_primary: Boolean,
-    },
-  ],
+  address: [AddressSchema], // Sử dụng AddressSchema để mỗi địa chỉ có _id riêng
   wishlist: [
     {
       product_id: mongoose.Schema.Types.ObjectId,

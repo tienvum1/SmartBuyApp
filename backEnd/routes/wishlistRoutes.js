@@ -9,6 +9,6 @@ router.post("/add", wishlistController.addToWishlist);
 router.get("/:userId", wishlistController.getWishlist);
 
 // Xóa sản phẩm khỏi Wishlist
-router.delete("/remove", wishlistController.removeFromWishlist);
+router.post("/remove", wishlistController.removeFromWishlist);
 
 module.exports = router;

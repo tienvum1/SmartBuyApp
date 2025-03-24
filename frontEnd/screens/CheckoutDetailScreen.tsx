@@ -22,7 +22,7 @@ interface CartItem {
 
 interface Address {
   _id: string;
-  telephone: string;
+  phone: string;
   address: string;
   is_primary?: boolean;
 }
@@ -117,7 +117,7 @@ const CheckoutDetailScreen: React.FC<CheckoutDetailScreenProps> = ({
       }}
     >
       <Text style={styles.addressText}>{item.address}</Text>
-      <Text style={styles.addressText}>{item.telephone}</Text>
+      <Text style={styles.addressText}>{item.phone}</Text>
     </TouchableOpacity>
   );
 
@@ -161,7 +161,7 @@ const CheckoutDetailScreen: React.FC<CheckoutDetailScreenProps> = ({
           <Text style={styles.optionLabel}>Delivery to</Text>
           <Text style={styles.optionValue}>
             {selectedAddress
-              ? `${selectedAddress.address} - ${selectedAddress.telephone}`
+              ? `${selectedAddress.address} - ${selectedAddress.phone}`
               : "Select Shipping Address"}
           </Text>
         </TouchableOpacity>

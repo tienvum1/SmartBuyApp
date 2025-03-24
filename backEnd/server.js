@@ -35,5 +35,16 @@ app.use("/carts", cartRoutes);
 app.use("/checkouts", checkoutRoutes);
 app.use("/wishlists", wishlistRoutes);
 
+// Direct route for removeAddress
+app.delete("/removeAddress/:userId/:addressId", async (req, res) => {
+  try {
+    const { removeAddress } = require("./controllers/userController");
+    await removeAddress(req, res);
+  } catch (error) {
+    console.error("Error in removeAddress route:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port localhost:${PORT}`));

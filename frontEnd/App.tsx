@@ -23,6 +23,8 @@ import CartScreen from "./screens/CartScreen";
 import CheckoutDetailScreen from "./screens/CheckoutDetailScreen";
 import WishListScreen from "./screens/WishListScreen";
 import OrderSuccessScreen from "./screens/OrderSuccessScreen";
+import AddAddressScreen from "./screens/AddAddressScreen";
+import AllAddressScreen from "./screens/AllAddressScreen";
 
 const Stack = createStackNavigator();
 
@@ -60,6 +62,8 @@ export default function App() {
           name="OrderSuccessScreen"
           component={OrderSuccessScreen}
         />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="AllAddressScreen" component={AllAddressScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

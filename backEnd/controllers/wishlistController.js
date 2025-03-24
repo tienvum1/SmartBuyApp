@@ -43,25 +43,34 @@ exports.addToWishlist = async (req, res) => {
 }; // Xóa sản phẩm khỏi Wishlist
 exports.removeFromWishlist = async (req, res) => {
   const { userId, productId } = req.body;
+  console.log("san pham bo ra", { userId, productId });
 
   try {
     const wishlist = await Wishlist.findOne({ user_id: userId });
 
-    if (wishlist) {
-      wishlist.products = wishlist.products.filter(
-        (item) => item.product_id.toString() !== productId
-      );
-
-      await wishlist.save();
-      return res.status(200).json({
-        success: true,
-        message: "Xóa sản phẩm khỏi Wishlist thành công!",
-      });
-    } else {
+    if (!wishlist) {
       return res
         .status(404)
         .json({ success: false, message: "Không tìm thấy Wishlist!" });
     }
+
+    const productIndex = wishlist.products.findIndex(
+      (item) => item.product_id.toString() === productId
+    );
+
+    if (productIndex === -1) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Sản phẩm không có trong Wishlist!" });
+    }
+
+    wishlist.products.splice(productIndex, 1); // Xóa sản phẩm khỏi mảng
+    await wishlist.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Xóa sản phẩm khỏi Wishlist thành công!",
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

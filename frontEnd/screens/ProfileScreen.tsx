@@ -82,6 +82,13 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
       <View style={styles.menuContainer}>
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={() => navigation.navigate("AllAddressScreen")}
+        >
+          <Text style={styles.menuText}>Address</Text>
+          <Icon name="chevron-forward" size={20} color="#000" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
           onPress={() => navigation.navigate("WishListScreen")}
         >
           <Text style={styles.menuText}>Wishlist</Text>
