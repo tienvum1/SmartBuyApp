@@ -248,7 +248,6 @@ const OrdersScreen = ({
   const renderOrderItem = ({ item }: { item: Order }) => {
     const statusLabels: { [key: string]: string } = {
       pending: "Chờ xử lý",
-      processing: "Đang xử lý",
       confirmed: "Đã xác nhận",
       shipped: "Đã giao cho đơn vị vận chuyển",
       out_for_delivery: "Đang giao hàng",
@@ -261,7 +260,6 @@ const OrdersScreen = ({
 
     const statusColors: { [key: string]: string } = {
       pending: "#FFA500",
-      processing: "#1E90FF",
       confirmed: "#32CD32",
       shipped: "#FFD700",
       out_for_delivery: "#FF4500",
@@ -316,7 +314,7 @@ const OrdersScreen = ({
           scrollEnabled={false}
         />
         <View style={styles.actions}>
-          {["pending", "processing", "confirmed", "shipped"].includes(
+          {["pending", "confirmed", "shipped"].includes(
             item.status
           ) && (
             <TouchableOpacity
@@ -350,7 +348,6 @@ const OrdersScreen = ({
   const renderStatusFilter = () => {
     const statuses = [
       "pending",
-      "processing",
       "confirmed",
       "shipped",
       "out_for_delivery",

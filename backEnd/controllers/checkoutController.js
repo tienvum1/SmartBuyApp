@@ -268,7 +268,6 @@ exports.getOrdersByStatus = async (req, res) => {
 
     const validStatuses = [
       "pending",
-      "processing",
       "confirmed",
       "shipped",
       "out_for_delivery",
