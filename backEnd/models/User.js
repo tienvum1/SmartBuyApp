@@ -26,12 +26,6 @@ const UserSchema = new mongoose.Schema({
     default: "null",
   },
   address: [AddressSchema], // Sử dụng AddressSchema để mỗi địa chỉ có _id riêng
-  wishlist: [
-    {
-      product_id: mongoose.Schema.Types.ObjectId,
-      added_at: { type: Date, default: Date.now },
-    },
-  ],
   payment: [
     {
       method: String,
