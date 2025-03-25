@@ -100,6 +100,7 @@ exports.getCart = async (req, res) => {
 
 exports.updateCartItem = async (req, res) => {
   try {
+    // sao mà user_id lại lấy ở params ? m có thể lấy nó khi m xác thực mà?
     const { user_id, item_id } = req.params;
     const { quantity } = req.body;
 

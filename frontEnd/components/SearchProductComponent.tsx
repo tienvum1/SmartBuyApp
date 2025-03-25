@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const SearchProductComponent = ({ navigation, userId }: { navigation: any, userId?: string }) => {
+const SearchProductComponent = ({ navigation }: { navigation: any }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,12 +19,9 @@ const SearchProductComponent = ({ navigation, userId }: { navigation: any, userI
       return;
     }
 
-    // Chuyển sang trang ProductScreen với query và userId
+    // Chuyển sang trang ProductScreen với query
     setLoading(true);
-    navigation.navigate("ProductScreen", { 
-      query: searchQuery.trim(),
-      userId: userId 
-    });
+    navigation.navigate("ProductScreen", { query: searchQuery.trim() });
     setLoading(false);
   };
 

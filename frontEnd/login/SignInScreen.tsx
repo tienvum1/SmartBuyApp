@@ -24,68 +24,24 @@ const SignInScreen = ({ navigation }: { navigation: any }) => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://10.0.2.2:5001/users/login", {
+      const response = await axios.post("http://localhost:5001/users/login", {
         email,
         password,
       });
-
+      console.log(response);
       if (response.status === 200) {
-        const { token, user } = response.data;
+        const { token, user } = response.data; // Giả sử API trả về token và thông tin user
 
-        // Kiểm tra tính hợp lệ của dữ liệu trả về
-        if (!token) {
-          Alert.alert("Lỗi", "Không nhận được token xác thực!");
-          return;
-        }
+        // Lưu token vào AsyncStorage
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
 
-        if (!user) {
-          Alert.alert("Lỗi", "Không nhận được thông tin người dùng!");
-          return;
-        }
-        
-        // Đảm bảo cấu trúc dữ liệu người dùng phù hợp
-        if (!user._id && user.id) {
-          user._id = user.id;
-        } else if (!user._id && !user.id) {
-          Alert.alert("Lỗi", "Dữ liệu người dùng không hợp lệ!");
-          return;
-        }
-        
-        try {
-          // Lưu token vào AsyncStorage
-          await AsyncStorage.setItem("token", token);
-          await AsyncStorage.setItem("user", JSON.stringify(user));
-
-          // Kiểm tra lại dữ liệu đã lưu
-          const savedToken = await AsyncStorage.getItem("token");
-          const savedUser = await AsyncStorage.getItem("user");
-          
-          if (!savedToken || !savedUser) {
-            Alert.alert("Lỗi", "Không thể lưu thông tin đăng nhập!");
-            return;
-          }
-          
-          if (savedUser) {
-            const parsedUser = JSON.parse(savedUser);
-            
-            if (!parsedUser._id && !parsedUser.id) {
-              Alert.alert("Lỗi", "Dữ liệu người dùng lưu trữ không hợp lệ!");
-              await AsyncStorage.removeItem("token");
-              await AsyncStorage.removeItem("user");
-              return;
-            }
-          }
-
-          Alert.alert("Thành công", "Đăng nhập thành công!");
-          // Truyền dữ liệu user vào route.params khi chuyển màn hình
-          navigation.navigate("HomePage", { user: user });
-        } catch (storageError) {
-          console.error("Error saving to AsyncStorage:", storageError);
-          Alert.alert("Lỗi", "Không thể lưu thông tin đăng nhập!");
-        }
+        Alert.alert("Thành công", "Đăng nhập thành công!");
+        navigation.navigate("HomePage");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Đăng nhập thất bại!";
+      const errorMessage =
+        error.response?.data?.message || "Đăng nhập thất bại!";
       Alert.alert("Lỗi", errorMessage);
     } finally {
       setLoading(false);
@@ -102,8 +58,6 @@ const SignInScreen = ({ navigation }: { navigation: any }) => {
         placeholderTextColor="#A0A0A0"
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
       />
 
       <TextInput

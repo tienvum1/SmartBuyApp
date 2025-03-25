@@ -49,6 +49,7 @@ type Product = {
   images: string[];
 };
 
+<<<<<<< HEAD
 // Thêm hàm tiện ích để lấy userId một cách an toàn
 const getUserId = (userData: any): string => {
   if (!userData) {
@@ -84,10 +85,13 @@ const getUserId = (userData: any): string => {
   return "default-user-id";
 };
 
+=======
+>>>>>>> 0aa2407 (fix db)
 // Component: SectionHeader
 const SectionHeader = ({
   title,
   navigation,
+<<<<<<< HEAD
   userData,
 }: {
   title: string;
@@ -122,6 +126,21 @@ const SectionHeader = ({
     </View>
   );
 };
+=======
+}: {
+  title: string;
+  navigation: any;
+}) => (
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>{title}</Text>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("ProductScreen", { query: title })}
+    >
+      <Text style={styles.seeAll}>See All</Text>
+    </TouchableOpacity>
+  </View>
+);
+>>>>>>> 0aa2407 (fix db)
 
 // Component chính: HomeScreen
 const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
@@ -132,6 +151,7 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true); // Trạng thái loading
 
+<<<<<<< HEAD
   // Cập nhật useEffect để theo dõi đầy đủ các thay đổi
   useEffect(() => {
     const initializeData = async () => {
@@ -190,20 +210,41 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
             await AsyncStorage.removeItem("token");
             navigation.navigate("SignInScreen");
             return;
+=======
+  // Lấy dữ liệu user từ AsyncStorage khi component mount
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        // Lấy user từ route.params nếu có, nếu không thì từ AsyncStorage
+        const userFromParams = route.params?.user;
+        if (userFromParams) {
+          setUser(userFromParams);
+        } else {
+          const storedUser = await AsyncStorage.getItem("user");
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+>>>>>>> 0aa2407 (fix db)
           }
         }
         // Fetch dữ liệu khác
         await fetchData();
       } catch (error) {
         console.error("Error initializing data:", error);
+<<<<<<< HEAD
         navigation.navigate("SignInScreen");
+=======
+>>>>>>> 0aa2407 (fix db)
       } finally {
         setLoading(false);
       }
     };
 
     initializeData();
+<<<<<<< HEAD
   }, [route.params]);
+=======
+  }, [route.params?.user]); // Theo dõi route.params.user để cập nhật nếu có thay đổi
+>>>>>>> 0aa2407 (fix db)
 
   const fetchData = async () => {
     try {
@@ -238,6 +279,7 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
     });
   };
 
+<<<<<<< HEAD
   // Thêm hàm refreshUserData
   const refreshUserData = async () => {
     try {
@@ -294,6 +336,8 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
     refreshUserData();
   }, []);
 
+=======
+>>>>>>> 0aa2407 (fix db)
   // Component: Header
   const Header = () => (
     <View style={styles.header}>
@@ -329,11 +373,15 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
           <TouchableOpacity
             style={styles.categoryItem}
             onPress={() =>
+<<<<<<< HEAD
               navigation.navigate("ProductScreen", {
                 brandId: item._id,
                 brandName: item.brand_name,
                 userId: getUserId(user),
               })
+=======
+              navigation.navigate("CategoryScreen", { brandId: item._id })
+>>>>>>> 0aa2407 (fix db)
             }
           >
             <Image
@@ -352,7 +400,11 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
   // Component: Product List (Danh sách sản phẩm)
   const ProductList = ({ title, data }: { title: string; data: Product[] }) => (
     <View>
+<<<<<<< HEAD
       <SectionHeader title={title} navigation={navigation} userData={user} />
+=======
+      <SectionHeader title={title} navigation={navigation} />
+>>>>>>> 0aa2407 (fix db)
       <FlatList
         data={data}
         keyExtractor={(item) => item._id}
@@ -364,7 +416,11 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
             isFavorite={favorites.has(item._id)}
             onPress={handleProductPress}
             onToggleFavorite={handleToggleFavorite}
+<<<<<<< HEAD
             userId={getUserId(user)}
+=======
+            userId={user?._id || "default-user-id"} // Sử dụng user._id từ AsyncStorage
+>>>>>>> 0aa2407 (fix db)
           />
         )}
         contentContainerStyle={styles.productList}
@@ -384,6 +440,7 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
   return (
     <View style={styles.container}>
       <Header />
+<<<<<<< HEAD
       <View style={styles.userInfoContainer}>
         <Text style={styles.userId}>
           User ID: {getUserId(user) || "Chưa đăng nhập"}
@@ -417,10 +474,14 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
           </Text>
         </TouchableOpacity>
       </View>
+=======
+      <Text>User ID: {user?._id || "Chưa đăng nhập"}</Text>
+>>>>>>> 0aa2407 (fix db)
       <FlatList
         data={[]}
         keyExtractor={(item, index) => index.toString()}
         renderItem={() => null}
+<<<<<<< HEAD
         ListHeaderComponent={() => (
           <>
             <SearchProductComponent
@@ -432,15 +493,29 @@ const HomeScreen = ({ navigation, route }: { navigation: any; route: any }) => {
               navigation={navigation}
               userData={user}
             />
+=======
+        ListHeaderComponent={
+          <>
+            <SearchProductComponent navigation={navigation} />
+            <SectionHeader title="Categories" navigation={navigation} />
+>>>>>>> 0aa2407 (fix db)
             <Categories />
             <ProductList title="Top Selling" data={topSellingProducts} />
             <ProductList title="New Arrivals" data={newProducts} />
           </>
+<<<<<<< HEAD
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       />
       <BottomNavigationBar navigation={navigation} activeScreen="Home" />
+=======
+        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContainer}
+      />
+      <BottomNavigationBar navigation={navigation} />
+>>>>>>> 0aa2407 (fix db)
     </View>
   );
 };
@@ -536,6 +611,7 @@ const styles = StyleSheet.create({
   productList: {
     paddingVertical: SIZES.padding,
   },
+<<<<<<< HEAD
   userId: {
     fontSize: SIZES.fontMedium,
     color: COLORS.black,
@@ -560,6 +636,8 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: "bold",
   },
+=======
+>>>>>>> 0aa2407 (fix db)
 });
 
 export default HomeScreen;

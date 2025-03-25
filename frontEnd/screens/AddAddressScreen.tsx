@@ -52,26 +52,13 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Kiểm tra nếu có userId từ route.params
-        if (route.params?.userId) {
-          console.log("Using userId from route params:", route.params.userId);
-          setUserId(route.params.userId);
-          setIsFetchingUser(false);
-          return;
-        }
-        
         const storedUser = await AsyncStorage.getItem("user");
-        console.log("Stored user data:", storedUser);
-        
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          console.log("Parsed user data:", user);
-          console.log("User ID:", user._id);
           setUserId(user._id);
         } else {
-          console.log("No user data found in AsyncStorage");
           Alert.alert("Lỗi", "Vui lòng đăng nhập để thêm địa chỉ!");
-          navigation.navigate("SignInScreen");
+          navigation.navigate("SignIn");
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -82,7 +69,7 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
     };
 
     fetchUser();
-  }, [route.params]);
+  }, []);
 
   // Hàm xử lý thêm địa chỉ
   const handleAddAddress = async () => {
@@ -90,16 +77,6 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
       Alert.alert("Lỗi", "Vui lòng nhập đầy đủ địa chỉ và số điện thoại!");
       return;
     }
-
-    // Kiểm tra userId
-    if (!userId) {
-      console.error("User ID is missing when trying to add address");
-      Alert.alert("Lỗi", "Không tìm thấy thông tin người dùng, vui lòng đăng nhập lại.");
-      navigation.navigate("SignInScreen");
-      return;
-    }
-    
-    console.log("Adding address for user ID:", userId);
 
     // Kiểm tra định dạng số điện thoại (ví dụ: 10 chữ số)
     const phoneRegex = /^\d{10}$/;
@@ -110,9 +87,6 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
 
     setIsLoading(true);
     try {
-      console.log("Sending API request to:", `http://10.0.2.2:5001/users/addAddress/${userId}`);
-      console.log("With data:", { address, phone });
-      
       const response = await axios.post(
         `http://10.0.2.2:5001/users/addAddress/${userId}`,
         {
@@ -120,8 +94,6 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
           phone,
         }
       );
-
-      console.log("API response:", response.data);
 
       if (response.status === 201) {
         Alert.alert("Thành công", "Địa chỉ đã được thêm thành công!", [
@@ -136,31 +108,10 @@ const AddAddressScreen: React.FC<AddAddressScreenProps> = ({
       }
     } catch (error: any) {
       console.error("Error adding address:", error);
-      console.error("Error response:", error.response?.data);
-      
-      // Xử lý lỗi cụ thể
-      if (error.response?.status === 404 && error.response?.data?.message === "User not found") {
-        Alert.alert(
-          "Lỗi",
-          "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                // Xóa thông tin người dùng cũ
-                AsyncStorage.removeItem("user");
-                // Chuyển đến màn hình đăng nhập
-                navigation.navigate("SignInScreen");
-              }
-            }
-          ]
-        );
-      } else {
-        Alert.alert(
-          "Lỗi",
-          error.response?.data?.message || "Có lỗi xảy ra khi thêm địa chỉ"
-        );
-      }
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Có lỗi xảy ra khi thêm địa chỉ"
+      );
     } finally {
       setIsLoading(false);
     }

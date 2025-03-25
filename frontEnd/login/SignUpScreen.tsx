@@ -18,7 +18,7 @@ const SignUpScreen = ({ navigation }: { navigation: any }) => {
 
   const handleSignUp = async () => {
     if (!fullName || !email || !password) {
-      Alert.alert("Vui lòng nhập đầy đủ thông tin", "Họ tên, email và mật khẩu là bắt buộc");
+      Alert.alert("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 

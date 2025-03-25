@@ -34,6 +34,7 @@ mongoose
 
 // Routes
 app.use("/brands", brandRoutes);
+// router
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
 app.use("/carts", cartRoutes);

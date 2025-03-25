@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+=======
+import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+>>>>>>> 0aa2407 (fix db)
 import axios from "axios";
 import {
   ScrollView,
@@ -12,6 +19,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+<<<<<<< HEAD
   Alert,
   StatusBar,
   Dimensions,
@@ -22,6 +30,11 @@ import SearchProductComponent from "../components/SearchProductComponent";
 import ProductItem from "../components/ProductItem";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomNavigationBar from "../components/BottomNavigationBar";
+=======
+} from "react-native";
+import SearchProductComponent from "../components/SearchProductComponent";
+import ProductItem from "../components/ProductItem";
+>>>>>>> 0aa2407 (fix db)
 
 // Định nghĩa type
 interface Product {
@@ -56,6 +69,7 @@ const COLORS = {
   lightGray: "#F5F5F5",
   purple: "#8E6CEF",
   darkPurple: "#7B5CFD",
+<<<<<<< HEAD
   blue: "#4A90E2",
   background: "#F9F9F9",
   shadowColor: "rgba(0, 0, 0, 0.05)",
@@ -66,6 +80,13 @@ const SIZES = {
   height: Dimensions.get("window").height,
   padding: 15,
   iconSize: 26,
+=======
+};
+
+const SIZES = {
+  padding: 15,
+  iconSize: 40,
+>>>>>>> 0aa2407 (fix db)
   fontLarge: 20,
   fontMedium: 16,
   fontSmall: 14,
@@ -80,11 +101,16 @@ const ProductScreen = ({
   navigation: any;
   route: any;
 }) => {
+<<<<<<< HEAD
   const { query, brandId, brandName, userId = "default-user-id", productType } = route.params || {};
+=======
+  const { query, userId = "default-user-id" } = route.params || {}; // userId mặc định nếu không truyền
+>>>>>>> 0aa2407 (fix db)
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+<<<<<<< HEAD
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [pageTitle, setPageTitle] = useState<string>("Products");
   const [filterVisible, setFilterVisible] = useState(false);
@@ -128,16 +154,33 @@ const ProductScreen = ({
   }, [brandName, query, productType]);
 
   const fetchProductsByQuery = async () => {
+=======
+  const [showPriceFilter, setShowPriceFilter] = useState(false);
+  const [showSortFilter, setShowSortFilter] = useState(false);
+
+  // Fetch products based on query
+  useEffect(() => {
+    if (query) {
+      fetchProducts();
+    }
+  }, [query]);
+
+  const fetchProducts = async () => {
+>>>>>>> 0aa2407 (fix db)
     try {
       setLoading(true);
       const response = await axios.get<Product[]>(
         `http://10.0.2.2:5001/products/name/${query.trim()}`
       );
+<<<<<<< HEAD
       setOriginalProducts(response.data);
+=======
+>>>>>>> 0aa2407 (fix db)
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
       setProducts([]);
+<<<<<<< HEAD
       setOriginalProducts([]);
     } finally {
       setLoading(false);
@@ -229,6 +272,8 @@ const ProductScreen = ({
     } catch (error) {
       console.error(`Error fetching products:`, error);
       setProducts([]);
+=======
+>>>>>>> 0aa2407 (fix db)
     } finally {
       setLoading(false);
     }
@@ -241,6 +286,7 @@ const ProductScreen = ({
   };
 
   // Toggle favorite
+<<<<<<< HEAD
   const handleToggleFavorite = async (productId: string) => {
     // Kiểm tra nếu người dùng chưa đăng nhập
     if (!userId || userId === "default-user-id") {
@@ -255,12 +301,19 @@ const ProductScreen = ({
     setFavorites((prev) => {
       const newFavorites = new Set(prev);
       if (isFavorite) {
+=======
+  const handleToggleFavorite = (productId: string) => {
+    setFavorites((prev) => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(productId)) {
+>>>>>>> 0aa2407 (fix db)
         newFavorites.delete(productId);
       } else {
         newFavorites.add(productId);
       }
       return newFavorites;
     });
+<<<<<<< HEAD
 
     // Xác định URL tương ứng với trạng thái yêu thích hiện tại
     const url = isFavorite
@@ -321,12 +374,15 @@ const ProductScreen = ({
       
       Alert.alert("Lỗi", "Có lỗi xảy ra khi kết nối đến server");
     }
+=======
+>>>>>>> 0aa2407 (fix db)
   };
 
   // Sort products
   const sortProducts = (
     criteria: "priceLowToHigh" | "priceHighToLow" | "newest" | "mostPopular"
   ) => {
+<<<<<<< HEAD
     // Quyết định danh sách sản phẩm để sắp xếp
     // Nếu bộ lọc giá đang áp dụng, tiếp tục sắp xếp trên kết quả đã lọc
     // Nếu không, sắp xếp trên danh sách gốc và áp dụng bộ lọc giá sau nếu cần
@@ -453,11 +509,35 @@ const ProductScreen = ({
     
     // Đóng bảng điều khiển bộ lọc
     setFilterVisible(false);
+=======
+    const sortedProducts = [...products];
+    switch (criteria) {
+      case "priceLowToHigh":
+        sortedProducts.sort((a, b) => a.price - b.price);
+        break;
+      case "priceHighToLow":
+        sortedProducts.sort((a, b) => b.price - a.price);
+        break;
+      case "newest":
+        sortedProducts.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        break;
+      case "mostPopular":
+        sortedProducts.sort((a, b) => b.sold - a.sold);
+        break;
+    }
+    setProducts(sortedProducts);
+    setShowPriceFilter(false);
+    setShowSortFilter(false);
+>>>>>>> 0aa2407 (fix db)
   };
 
   // Render header
   const renderHeader = () => (
     <View style={styles.header}>
+<<<<<<< HEAD
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.white} />
       <View style={styles.headerContent}>
         <TouchableOpacity
@@ -668,6 +748,94 @@ const ProductScreen = ({
           )}
         </View>
       )}
+=======
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={SIZES.iconSize}
+          color={COLORS.black}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.cartButton}>
+        <Icon name="cart-outline" size={SIZES.iconSize} color={COLORS.white} />
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Render filter buttons
+  const renderFilterButtons = () => (
+    <View style={styles.filterContainer}>
+      <View style={styles.filterWrapper}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => {
+            setShowPriceFilter(!showPriceFilter);
+            setShowSortFilter(false);
+          }}
+        >
+          <Text style={styles.filterButtonText}>Price</Text>
+          <Icon
+            name="chevron-down"
+            size={SIZES.fontMedium}
+            color={COLORS.white}
+          />
+        </TouchableOpacity>
+        {showPriceFilter && (
+          <View style={styles.dropdown}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => sortProducts("priceLowToHigh")}
+            >
+              <Text style={styles.dropdownText}>Low to High</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => sortProducts("priceHighToLow")}
+            >
+              <Text style={styles.dropdownText}>High to Low</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.filterWrapper}>
+        <TouchableOpacity
+          style={[styles.filterButton, styles.sortButton]}
+          onPress={() => {
+            setShowSortFilter(!showSortFilter);
+            setShowPriceFilter(false);
+          }}
+        >
+          <Text style={[styles.filterButtonText, styles.sortButtonText]}>
+            Sort by
+          </Text>
+          <Icon
+            name="chevron-down"
+            size={SIZES.fontMedium}
+            color={COLORS.black}
+          />
+        </TouchableOpacity>
+        {showSortFilter && (
+          <View style={styles.dropdown}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => sortProducts("newest")}
+            >
+              <Text style={styles.dropdownText}>Newest</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => sortProducts("mostPopular")}
+            >
+              <Text style={styles.dropdownText}>Most Popular</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+>>>>>>> 0aa2407 (fix db)
     </View>
   );
 
@@ -675,6 +843,7 @@ const ProductScreen = ({
   const renderProductList = () => (
     <View style={styles.productContainer}>
       {loading ? (
+<<<<<<< HEAD
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.darkPurple} />
           <Text style={styles.loadingText}>Loading products...</Text>
@@ -693,6 +862,11 @@ const ProductScreen = ({
             <Text style={styles.browseButtonText}>Quay về trang chủ</Text>
           </TouchableOpacity>
         </View>
+=======
+        <ActivityIndicator size="large" color={COLORS.darkPurple} />
+      ) : products.length === 0 ? (
+        <Text style={styles.noResultsText}>Không tìm thấy sản phẩm nào.</Text>
+>>>>>>> 0aa2407 (fix db)
       ) : (
         <FlatList
           data={products}
@@ -711,7 +885,11 @@ const ProductScreen = ({
               onPress={handleProductPress}
               onToggleFavorite={handleToggleFavorite}
               isSelected={selectedProduct === item._id}
+<<<<<<< HEAD
               userId={userId || ""}
+=======
+              userId={userId} // Truyền userId vào ProductItem
+>>>>>>> 0aa2407 (fix db)
             />
           )}
           showsVerticalScrollIndicator={false}
@@ -721,16 +899,41 @@ const ProductScreen = ({
     </View>
   );
 
+<<<<<<< HEAD
+=======
+  // Render bottom navigation
+  const renderBottomNav = () => (
+    <View style={styles.bottomNav}>
+      {["home", "notifications", "assignment", "account-circle"].map(
+        (iconName, index) => (
+          <TouchableOpacity key={index} style={styles.navItem}>
+            <MaterialIcon name={iconName} size={30} color={COLORS.black} />
+          </TouchableOpacity>
+        )
+      )}
+    </View>
+  );
+
+>>>>>>> 0aa2407 (fix db)
   // Main render
   return (
     <View style={styles.container}>
       {renderHeader()}
+<<<<<<< HEAD
       <View style={styles.mainContent}>
         <SearchProductComponent navigation={navigation} userId={userId} />
         {renderFilterOptions()}
         {renderProductList()}
       </View>
       <BottomNavigationBar navigation={navigation} activeScreen="Search" />
+=======
+      <ScrollView style={styles.scrollContainer}>
+        <SearchProductComponent navigation={navigation} />
+        {renderFilterButtons()}
+        {renderProductList()}
+      </ScrollView>
+      {renderBottomNav()}
+>>>>>>> 0aa2407 (fix db)
     </View>
   );
 };
@@ -739,6 +942,7 @@ const ProductScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
     backgroundColor: COLORS.background,
   },
   mainContent: {
@@ -766,10 +970,30 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+=======
+    backgroundColor: COLORS.white,
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingHorizontal: SIZES.padding,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: SIZES.padding,
+    paddingTop: 40,
+  },
+  backButton: {
+    width: SIZES.iconSize,
+    height: SIZES.iconSize,
+    borderRadius: SIZES.iconSize / 2,
+>>>>>>> 0aa2407 (fix db)
     backgroundColor: COLORS.lightGray,
     justifyContent: "center",
     alignItems: "center",
   },
+<<<<<<< HEAD
   titleContainer: {
     flex: 1,
     marginLeft: 15,
@@ -1039,6 +1263,92 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: COLORS.gray,
+=======
+  cartButton: {
+    width: SIZES.iconSize,
+    height: SIZES.iconSize,
+    borderRadius: SIZES.iconSize / 2,
+    backgroundColor: COLORS.purple,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  filterContainer: {
+    flexDirection: "row",
+    gap: 20,
+    paddingVertical: 15,
+  },
+  filterWrapper: {
+    position: "relative",
+  },
+  filterButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.darkPurple,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: SIZES.borderRadius,
+  },
+  sortButton: {
+    backgroundColor: COLORS.lightGray,
+  },
+  filterButtonText: {
+    fontSize: SIZES.fontMedium,
+    fontWeight: "bold",
+    color: COLORS.white,
+    marginRight: 8,
+  },
+  sortButtonText: {
+    color: COLORS.black,
+  },
+  dropdown: {
+    position: "absolute",
+    top: 45,
+    left: 0,
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  dropdownItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  dropdownText: {
+    fontSize: SIZES.fontMedium,
+    color: COLORS.black,
+  },
+  productContainer: {
+    flex: 1,
+    paddingBottom: 20,
+  },
+  productList: {
+    paddingBottom: 20,
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
+  },
+  noResultsText: {
+    textAlign: "center",
+    fontSize: SIZES.fontLarge,
+    color: COLORS.gray,
+    marginTop: 20,
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.lightGray,
+  },
+  navItem: {
+    justifyContent: "center",
+    alignItems: "center",
+>>>>>>> 0aa2407 (fix db)
   },
 });
 

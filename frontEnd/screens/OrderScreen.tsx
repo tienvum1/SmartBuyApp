@@ -57,6 +57,10 @@ const OrdersScreen = ({
   const getUserId = async () => {
     const userString = await AsyncStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
+<<<<<<< HEAD
+=======
+    console.log("User from AsyncStorage:", user);
+>>>>>>> 0aa2407 (fix db)
     return user?._id;
   };
 
@@ -70,12 +74,25 @@ const OrdersScreen = ({
         return;
       }
 
+<<<<<<< HEAD
+=======
+      console.log(
+        "Fetching orders for userId:",
+        userId,
+        "with status:",
+        status
+      );
+>>>>>>> 0aa2407 (fix db)
       const url = status
         ? `http://10.0.2.2:5001/checkouts/orders/${userId}/${status}`
         : `http://10.0.2.2:5001/checkouts/user-orders?userId=${userId}${
             status ? `&status=${status}` : ""
           }`;
       const response = await axios.get(url);
+<<<<<<< HEAD
+=======
+      console.log("Orders response:", response.data);
+>>>>>>> 0aa2407 (fix db)
       setOrders(response.data.orders);
 
       if (orderIdFromNotification) {
@@ -84,7 +101,11 @@ const OrdersScreen = ({
         );
         if (index !== -1) {
           setTimeout(() => {
+<<<<<<< HEAD
             flatListRef.current?.scrollToIndex({ index, animated: true });
+=======
+            flatListRef.current?.scrollToIndex({ index, animated: true }); // Sử dụng flatListRef.current
+>>>>>>> 0aa2407 (fix db)
           }, 500);
         }
       }
@@ -406,7 +427,11 @@ const OrdersScreen = ({
           }}
         />
       )}
+<<<<<<< HEAD
       <BottomNavigationBar navigation={navigation} activeScreen="Orders" />
+=======
+      <BottomNavigationBar navigation={navigation} />
+>>>>>>> 0aa2407 (fix db)
     </View>
   );
 };
@@ -415,7 +440,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+<<<<<<< HEAD
     paddingBottom: 80,
+=======
+>>>>>>> 0aa2407 (fix db)
   },
   header: {
     flexDirection: "row",

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
+<<<<<<< HEAD
 import BottomNavigationBar from "../components/BottomNavigationBar";
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
@@ -17,17 +18,36 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
   useEffect(() => {
     // Lấy thông tin người dùng và token từ AsyncStorage
+=======
+import BottomNavigationBar from "../components/BottomNavigationBar"; // Đường dẫn có thể cần điều chỉnh
+
+const ProfileScreen = ({ navigation }: { navigation: any }) => {
+  const [user, setUser] = useState<any>(null); // Dùng useState để lưu thông tin người dùng
+  const [token, setToken] = useState<string | null>(null); // Lưu token
+
+  useEffect(() => {
+    // Lấy thông tin người dùng và token từ AsyncStorage khi component được render
+>>>>>>> 0aa2407 (fix db)
     const getUserData = async () => {
       try {
         const storedUser = await AsyncStorage.getItem("user");
         const storedToken = await AsyncStorage.getItem("token");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
+<<<<<<< HEAD
           setUser(parsedUser);
         }
 
         if (storedToken) {
           setToken(storedToken);
+=======
+          setUser(parsedUser); // Lưu dữ liệu người dùng
+          console.log("User Data:", parsedUser); // Kiểm tra dữ liệu
+        }
+
+        if (storedToken) {
+          setToken(storedToken); // Lưu token
+>>>>>>> 0aa2407 (fix db)
         }
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu từ AsyncStorage", error);
@@ -35,10 +55,17 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     };
 
     getUserData();
+<<<<<<< HEAD
   }, []);
 
   if (!user) {
     return <Text>Đang tải thông tin người dùng...</Text>;
+=======
+  }, []); // useEffect chỉ chạy một lần khi component render lần đầu
+
+  if (!user) {
+    return <Text>Đang tải thông tin người dùng...</Text>; // Hiển thị khi thông tin chưa được tải
+>>>>>>> 0aa2407 (fix db)
   }
 
   return (
@@ -123,7 +150,11 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       <BottomNavigationBar navigation={navigation} activeScreen="Profile" />
+=======
+      <BottomNavigationBar navigation={navigation} />
+>>>>>>> 0aa2407 (fix db)
     </SafeAreaView>
   );
 };
