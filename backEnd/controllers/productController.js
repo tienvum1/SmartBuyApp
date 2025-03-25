@@ -125,3 +125,25 @@ exports.getProductByName = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Lấy sản phẩm theo thương hiệu (brand_id)
+exports.getProductsByBrand = async (req, res) => {
+  try {
+    const brandId = req.params.brandId;
+    
+    if (!brandId) {
+      return res.status(400).json({ message: "Brand ID không được để trống" });
+    }
+    
+    const products = await Product.find({ brand_id: brandId });
+    
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm nào thuộc thương hiệu này" });
+    }
+    
+    res.json(products);
+  } catch (err) {
+    console.error("Error getting products by brand:", err);
+    res.status(500).json({ error: err.message });
+  }
+};

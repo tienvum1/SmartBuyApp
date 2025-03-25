@@ -22,8 +22,8 @@ const UserSchema = new mongoose.Schema({
   status: { type: String, default: "active" },
   phone: {
     type: String,
-    sparse: true,
-    default: "null",
+    sparse: true, // Sparse index cho phép nhiều giá trị null
+    unique: false, // Bỏ hoặc đặt unique: false để tránh lỗi duplicate key
   },
   address: [AddressSchema], // Sử dụng AddressSchema để mỗi địa chỉ có _id riêng
   payment: [
@@ -37,4 +37,9 @@ const UserSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("User", UserSchema, "users");
+// Đảm bảo không tạo index trên phoneNumber (nếu có) vì trường này không tồn tại trong schema
+UserSchema.index({ email: 1 }, { unique: true }); // Chỉ tạo index unique trên email
+
+// Tạo và export model User
+const User = mongoose.model("User", UserSchema);
+module.exports = User;

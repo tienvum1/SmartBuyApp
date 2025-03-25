@@ -9,26 +9,25 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
-import BottomNavigationBar from "../components/BottomNavigationBar"; // Đường dẫn có thể cần điều chỉnh
+import BottomNavigationBar from "../components/BottomNavigationBar";
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
-  const [user, setUser] = useState<any>(null); // Dùng useState để lưu thông tin người dùng
-  const [token, setToken] = useState<string | null>(null); // Lưu token
+  const [user, setUser] = useState<any>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Lấy thông tin người dùng và token từ AsyncStorage khi component được render
+    // Lấy thông tin người dùng và token từ AsyncStorage
     const getUserData = async () => {
       try {
         const storedUser = await AsyncStorage.getItem("user");
         const storedToken = await AsyncStorage.getItem("token");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser); // Lưu dữ liệu người dùng
-          console.log("User Data:", parsedUser); // Kiểm tra dữ liệu
+          setUser(parsedUser);
         }
 
         if (storedToken) {
-          setToken(storedToken); // Lưu token
+          setToken(storedToken);
         }
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu từ AsyncStorage", error);
@@ -36,10 +35,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
     };
 
     getUserData();
-  }, []); // useEffect chỉ chạy một lần khi component render lần đầu
+  }, []);
 
   if (!user) {
-    return <Text>Đang tải thông tin người dùng...</Text>; // Hiển thị khi thông tin chưa được tải
+    return <Text>Đang tải thông tin người dùng...</Text>;
   }
 
   return (
@@ -124,7 +123,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
         <Text style={styles.signOutText}>Sign Out</Text>
       </TouchableOpacity>
 
-      <BottomNavigationBar navigation={navigation} />
+      <BottomNavigationBar navigation={navigation} activeScreen="Profile" />
     </SafeAreaView>
   );
 };

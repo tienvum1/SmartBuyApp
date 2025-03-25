@@ -18,7 +18,7 @@ const OrderSuccessScreen = ({ navigation }: { navigation: any }) => {
         <View style={styles.card}>
           <Text style={styles.title}>🎉 Order Placed Successfully!</Text>
           <Text style={styles.subtitle}>
-            A confirmation has been sent to your email.
+            Your order is now being processed.
           </Text>
           <TouchableOpacity
             style={styles.button}

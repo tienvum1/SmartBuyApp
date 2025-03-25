@@ -13,10 +13,11 @@ import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
+import BottomNavigationBar from "../components/BottomNavigationBar";
 
 type RootStackParamList = {
   CartScreen: { userId: string };
-  CheckoutDetailScreen: { selectedItems: CartItem[]; total: number }; // Removed total from params
+  CheckoutDetailScreen: { selectedItems: CartItem[]; total: number };
   Login: undefined;
 };
 
@@ -297,7 +298,7 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
             navigation.navigate("CheckoutDetailScreen", {
               selectedItems: getSelectedItemsData(),
               total: selectedSubtotal,
-            }) // Removed total from navigation params
+            })
         }
         disabled={selectedItems.length === 0}
         activeOpacity={0.7}
@@ -312,17 +313,18 @@ const CartScreen: React.FC<CartScreenProps> = ({ navigation }) => {
           style={styles.checkoutIcon}
         />
       </TouchableOpacity>
+      
+      <BottomNavigationBar navigation={navigation} activeScreen="Cart" />
     </View>
   );
 };
-
-// ... (styles remain unchanged)
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F7FAFC",
     padding: 16,
+    paddingBottom: 80,
   },
   loadingContainer: {
     flex: 1,

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
@@ -17,7 +18,7 @@ const SignUpScreen = ({ navigation }: { navigation: any }) => {
 
   const handleSignUp = async () => {
     if (!fullName || !email || !password) {
-      Alert.alert("Vui lòng nhập đầy đủ thông tin");
+      Alert.alert("Vui lòng nhập đầy đủ thông tin", "Họ tên, email và mật khẩu là bắt buộc");
       return;
     }
 
@@ -25,7 +26,7 @@ const SignUpScreen = ({ navigation }: { navigation: any }) => {
       const res = await axios.post("http://10.0.2.2:5001/users/register", {
         full_name: fullName,
         email,
-        password,
+        password
       });
 
       Alert.alert("Đăng ký thành công!");
@@ -39,52 +40,59 @@ const SignUpScreen = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.icon}
-        onPress={() => navigation.navigate("SignIn")}
-      >
-        <Ionicons name="chevron-back" size={40} color="black" />
-      </TouchableOpacity>
-      <Text style={styles.title}>Tạo tài khoản</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Họ và tên"
-        value={fullName}
-        onChangeText={setFullName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Mật khẩu"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Đăng ký</Text>
-      </TouchableOpacity>
-      <Text style={styles.text}>
-        Đã có tài khoản?{" "}
-        <Text
-          style={styles.boldText}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.icon}
           onPress={() => navigation.navigate("SignIn")}
         >
-          Đăng nhập
+          <Ionicons name="chevron-back" size={40} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Tạo tài khoản</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Họ và tên"
+          value={fullName}
+          onChangeText={setFullName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Mật khẩu"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Đăng ký</Text>
+        </TouchableOpacity>
+        <Text style={styles.text}>
+          Đã có tài khoản?{" "}
+          <Text
+            style={styles.boldText}
+            onPress={() => navigation.navigate("SignIn")}
+          >
+            Đăng nhập
+          </Text>
         </Text>
-      </Text>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
 export default SignUpScreen;
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     justifyContent: "flex-start",
@@ -92,11 +100,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     backgroundColor: "#FFF",
     width: "100%",
+    paddingBottom: 30,
   },
   title: {
     fontSize: 60,
     fontWeight: "bold",
-    marginTop: 190,
+    marginTop: 140,
     marginBottom: 35,
     color: "#000",
   },

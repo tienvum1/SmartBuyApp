@@ -13,10 +13,20 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ full_name, email, password: hashedPassword });
+    
+    const newUser = new User({ 
+      full_name, 
+      email, 
+      password: hashedPassword
+      // Không cần phone field, sẽ được set null theo mặc định
+    });
 
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
+    
+    res.status(201).json({ 
+      message: "User registered successfully",
+      requiresVerification: false
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -26,11 +36,13 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Email and password are required" });
     }
+    
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -42,6 +54,7 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    
     console.log(token, user);
     res.json({ token, user });
   } catch (error) {
@@ -231,6 +244,37 @@ exports.removeAddress = async (req, res) => {
     });
   } catch (error) {
     console.error("Error removing address:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: "Email và mật khẩu mới là bắt buộc" });
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự" });
+    }
+    
+    // Tìm user theo email
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng với email này" });
+    }
+    
+    // Cập nhật mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+    
+    res.status(200).json({ message: "Mật khẩu đã được cập nhật thành công" });
+  } catch (error) {
+    console.error("Reset password error:", error);
     res.status(500).json({ message: error.message });
   }
 };

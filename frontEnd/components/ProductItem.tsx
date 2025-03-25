@@ -55,91 +55,15 @@ const ProductItem: React.FC<ProductItemProps> = ({
   isSelected = false,
   userId,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
   // Hàm định dạng giá tiền
   const formatPrice = (price: number): string => {
     return `${price.toLocaleString()} Vnd`;
   };
 
-  // Hàm gọi API để thêm hoặc xóa sản phẩm khỏi Wishlist
-  const handleToggleFavorite = async () => {
-    if (isLoading) return;
-
-    if (!userId || userId === "default-user-id") {
-      Alert.alert("Thông báo", "Vui lòng đăng nhập để sử dụng tính năng này!");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const url = isFavorite
-        ? "http://10.0.2.2:5001/wishlists/remove"
-        : "http://10.0.2.2:5001/wishlists/add";
-
-      console.log(`Calling API: ${url}, isFavorite: ${isFavorite}`);
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          productId: product._id,
-        }),
-      });
-
-      // Kiểm tra Content-Type của phản hồi
-      const contentType = response.headers.get("content-type");
-      console.log("Content-Type:", contentType);
-
-      if (!contentType || !contentType.includes("application/json")) {
-        // Nếu không phải JSON, log toàn bộ phản hồi để debug
-        const text = await response.text();
-        console.error("Non-JSON response:", text);
-        throw new Error("Server did not return JSON");
-      }
-
-      const responseData = await response.json();
-      console.log("Response from server:", responseData);
-
-      if (response.ok && responseData.success) {
-        onToggleFavorite(product._id);
-        console.log(
-          `Successfully ${isFavorite ? "removed from" : "added to"} Wishlist`
-        );
-      } else if (
-        response.status === 400 &&
-        responseData.message === "Sản phẩm không có trong Wishlist!"
-      ) {
-        if (isFavorite) {
-          onToggleFavorite(product._id);
-          console.log("Synchronized client state: removed from favorites");
-        }
-        Alert.alert("Thông báo", responseData.message);
-      } else if (
-        response.status === 400 &&
-        responseData.message === "Sản phẩm đã có trong Wishlist!"
-      ) {
-        if (!isFavorite) {
-          onToggleFavorite(product._id);
-          console.log("Synchronized client state: added to favorites");
-        }
-        Alert.alert("Thông báo", responseData.message);
-      } else {
-        Alert.alert(
-          "Lỗi",
-          responseData.message || "Không thể cập nhật Wishlist"
-        );
-      }
-    } catch (error) {
-      console.error("Network Error:", error);
-      Alert.alert("Lỗi", "Có lỗi xảy ra khi kết nối đến server");
-    } finally {
-      setIsLoading(false);
-      console.log("Finished API call, isLoading set to false");
-    }
+  // Hàm xử lý sự kiện khi nhấn vào nút yêu thích
+  const handleToggleFavorite = () => {
+    // Gọi callback onToggleFavorite được truyền từ component cha
+    onToggleFavorite(product._id);
   };
 
   return (
@@ -149,17 +73,12 @@ const ProductItem: React.FC<ProductItemProps> = ({
         <TouchableOpacity
           style={styles.wishlistButton}
           onPress={handleToggleFavorite}
-          disabled={isLoading}
         >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={COLORS.darkGray} />
-          ) : (
-            <Icon
-              name={isFavorite ? "favorite" : "favorite-border"}
-              size={SIZES.iconSize}
-              color={isFavorite ? COLORS.red : COLORS.darkGray}
-            />
-          )}
+          <Icon
+            name={isFavorite ? "favorite" : "favorite-border"}
+            size={SIZES.iconSize}
+            color={isFavorite ? COLORS.red : COLORS.darkGray}
+          />
         </TouchableOpacity>
 
         {/* Hình ảnh sản phẩm */}

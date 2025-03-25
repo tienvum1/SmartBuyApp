@@ -5,28 +5,133 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback
 } from "react-native";
+import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
 
 const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert("Lỗi", "Vui lòng nhập địa chỉ email!");
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      Alert.alert("Lỗi", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Lỗi", "Địa chỉ email không hợp lệ!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post("http://10.0.2.2:5001/users/reset-password", {
+        email,
+        newPassword
+      });
+
+      Alert.alert(
+        "Thành công",
+        "Mật khẩu của bạn đã được đặt lại thành công!",
+        [
+          {
+            text: "Đăng nhập",
+            onPress: () => navigation.navigate("SignIn")
+          }
+        ]
+      );
+    } catch (error: any) {
+      const errorMessage = 
+        error.response?.data?.message || 
+        "Không thể đặt lại mật khẩu. Vui lòng thử lại sau.";
+      
+      Alert.alert("Lỗi", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Email Address"
-        value={email}
-        onChangeText={setEmail}
-      />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.icon}
+          onPress={() => navigation.navigate("SignIn")}
+        >
+          <Ionicons name="chevron-back" size={40} color="black" />
+        </TouchableOpacity>
+        
+        <Text style={styles.title}>Đặt Lại Mật Khẩu</Text>
+        <Text style={styles.subtitle}>
+          Nhập email và mật khẩu mới của bạn để đặt lại mật khẩu
+        </Text>
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Địa chỉ email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ResetPassword")}
-      >
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-    </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Mật khẩu mới"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Xác nhận mật khẩu mới"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleResetPassword}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Đặt lại mật khẩu</Text>
+          )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.returnLink}
+          onPress={() => navigation.navigate("SignIn")}
+        >
+          <Text style={styles.returnText}>Quay lại đăng nhập</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -44,9 +149,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 60,
     fontWeight: "bold",
-    marginTop: 190,
-    marginBottom: 35,
+    marginTop: 140,
+    marginBottom: 20,
     color: "#000",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 30,
+    lineHeight: 24,
   },
   icon: {
     position: "absolute",
@@ -88,15 +199,13 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
   },
-  text: {
-    marginTop: 27,
-    fontSize: 20,
-    color: "#000",
+  returnLink: {
+    marginTop: 25,
+    alignSelf: 'center',
   },
-  boldText: {
-    fontWeight: "bold",
-    color: "#000",
-    marginTop: 27,
-    fontSize: 20,
+  returnText: {
+    fontSize: 18,
+    color: "#7B5BDF",
+    fontWeight: "600",
   },
 });

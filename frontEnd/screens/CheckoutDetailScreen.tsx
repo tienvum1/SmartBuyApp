@@ -53,21 +53,28 @@ const CheckoutDetailScreen = ({ navigation, route }: Props) => {
     const fetchAddressesAndSetTotal = async () => {
       try {
         const userString = await AsyncStorage.getItem("user");
+        console.log("CheckoutDetailScreen - User in AsyncStorage:", userString);
+        
         if (!userString) {
-          navigation.navigate("Login");
+          console.log("CheckoutDetailScreen - No user found in AsyncStorage");
+          navigation.navigate("SignInScreen");
           return;
         }
 
         const user = JSON.parse(userString);
+        console.log("CheckoutDetailScreen - Parsed user:", user);
+        
         const userId = user._id;
         if (!userId) {
-          console.error("User ID is missing in AsyncStorage");
+          console.error("CheckoutDetailScreen - User ID is missing in AsyncStorage");
+          console.log("CheckoutDetailScreen - User data structure:", JSON.stringify(user, null, 2));
           setAddresses([]);
           setUserId(null);
           return;
         }
 
         setUserId(userId);
+        console.log("CheckoutDetailScreen - Using userId:", userId);
 
         const addressResponse = await axios.get(
           `http://10.0.2.2:5001/users/getAllAddresses/${userId}`
@@ -169,7 +176,10 @@ const CheckoutDetailScreen = ({ navigation, route }: Props) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate("AddAddressScreen")}
+          onPress={() => {
+            console.log("Navigating to AddAddressScreen with userId:", userId);
+            navigation.navigate("AddAddressScreen", { userId });
+          }}
         >
           <Text style={styles.addButtonText}>+ Add New Address</Text>
         </TouchableOpacity>

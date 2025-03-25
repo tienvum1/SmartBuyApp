@@ -57,7 +57,6 @@ const OrdersScreen = ({
   const getUserId = async () => {
     const userString = await AsyncStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
-    console.log("User from AsyncStorage:", user);
     return user?._id;
   };
 
@@ -71,19 +70,12 @@ const OrdersScreen = ({
         return;
       }
 
-      console.log(
-        "Fetching orders for userId:",
-        userId,
-        "with status:",
-        status
-      );
       const url = status
         ? `http://10.0.2.2:5001/checkouts/orders/${userId}/${status}`
         : `http://10.0.2.2:5001/checkouts/user-orders?userId=${userId}${
             status ? `&status=${status}` : ""
           }`;
       const response = await axios.get(url);
-      console.log("Orders response:", response.data);
       setOrders(response.data.orders);
 
       if (orderIdFromNotification) {
@@ -92,7 +84,7 @@ const OrdersScreen = ({
         );
         if (index !== -1) {
           setTimeout(() => {
-            flatListRef.current?.scrollToIndex({ index, animated: true }); // Sử dụng flatListRef.current
+            flatListRef.current?.scrollToIndex({ index, animated: true });
           }, 500);
         }
       }
@@ -414,7 +406,7 @@ const OrdersScreen = ({
           }}
         />
       )}
-      <BottomNavigationBar navigation={navigation} />
+      <BottomNavigationBar navigation={navigation} activeScreen="Orders" />
     </View>
   );
 };
@@ -423,6 +415,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingBottom: 80,
   },
   header: {
     flexDirection: "row",
