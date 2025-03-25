@@ -4,10 +4,10 @@ const Cart = require("../models/Cart");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
-// Place order (COD only) - Giữ nguyên từ code trước
+// Place order (COD and Stripe) - Đã cập nhật để hỗ trợ Stripe
 exports.placeOrder = async (req, res) => {
   try {
-    const { shippingAddressId, paymentMethod, selectedItemIds, total, userId } =
+    const { shippingAddressId, paymentMethod, selectedItemIds, total, userId, paymentIntentId } =
       req.body;
     console.log(req.body);
     console.log("User ID from placeOrder:", userId);
@@ -16,6 +16,7 @@ exports.placeOrder = async (req, res) => {
       paymentMethod,
       selectedItemIds,
       total,
+      paymentIntentId
     });
 
     if (
@@ -33,10 +34,19 @@ exports.placeOrder = async (req, res) => {
     }
     console.log("Dữ liệu đầu vào hợp lệ");
 
-    if (paymentMethod !== "cod") {
+    // Kiểm tra phương thức thanh toán hợp lệ
+    if (paymentMethod !== "cod" && paymentMethod !== "stripe") {
       return res.status(400).json({
         success: false,
-        message: "Only 'cod' payment method is supported",
+        message: "Only 'cod' and 'stripe' payment methods are supported",
+      });
+    }
+
+    // Nếu thanh toán qua Stripe, cần paymentIntentId
+    if (paymentMethod === "stripe" && !paymentIntentId) {
+      return res.status(400).json({
+        success: false,
+        message: "PaymentIntentId is required for Stripe payments",
       });
     }
 
@@ -137,7 +147,8 @@ exports.placeOrder = async (req, res) => {
         phone: shippingAddress.phone,
         address: shippingAddress.address,
       },
-      payment_method: "cod",
+      payment_method: paymentMethod,
+      payment_intent_id: paymentMethod === 'stripe' ? paymentIntentId : undefined,
       subtotal,
       shipping_cost: shippingCost,
       tax,
@@ -172,7 +183,8 @@ exports.placeOrder = async (req, res) => {
           phone: shippingAddress.phone,
           address: shippingAddress.address,
         },
-        paymentMethod: "cod",
+        paymentMethod,
+        paymentIntentId: order.payment_intent_id,
         status: order.status,
       },
     });

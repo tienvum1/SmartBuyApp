@@ -31,6 +31,7 @@ const orderSchema = new mongoose.Schema({
     address: { type: String, required: true },
   },
   payment_method: { type: String, required: true },
+  payment_intent_id: { type: String },
   subtotal: { type: Number, required: true },
   shipping_cost: { type: Number, required: true },
   tax: { type: Number, required: true },

@@ -102,6 +102,7 @@ exports.addAddress = async (req, res) => {
       _id: new mongoose.Types.ObjectId(),
       address,
       phone,
+      telephone: phone,
     });
 
     // Lưu người dùng
@@ -141,9 +142,7 @@ exports.removeAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
 
-    console.log(
-      `Attempting to remove address with ID: ${addressId} for user: ${userId}`
-    );
+    console.log(`Attempting to remove address with ID: ${addressId} for user: ${userId}`);
 
     // Tìm người dùng theo userId
     const user = await User.findById(userId);
@@ -158,28 +157,24 @@ exports.removeAddress = async (req, res) => {
     user.address.forEach((addr, index) => {
       console.log(`Address ${index + 1}:`);
       console.log(` - _id: ${addr._id} (${typeof addr._id})`);
-      console.log(
-        ` - _id.toString(): ${
-          addr._id ? addr._id.toString() : "undefined"
-        } (${typeof (addr._id ? addr._id.toString() : undefined)})`
-      );
+      console.log(` - _id.toString(): ${addr._id ? addr._id.toString() : 'undefined'} (${typeof (addr._id ? addr._id.toString() : undefined)})`);
       console.log(` - address: ${addr.address}`);
       console.log(` - phone: ${addr.phone}, telephone: ${addr.telephone}`);
       // Check if this ID matches the one we're looking for
-      const addrIdStr = addr._id ? addr._id.toString() : "";
+      const addrIdStr = addr._id ? addr._id.toString() : '';
       console.log(` - matches requested ID: ${addrIdStr === addressId}`);
     });
 
     // Kiểm tra nếu địa chỉ tồn tại - tìm kiếm linh hoạt hơn
     let addressIndex = -1;
-
+    
     // Cố gắng tìm theo nhiều cách khác nhau
-
+    
     // 1. Tìm bằng _id.toString() - cách chính xác nhất
     addressIndex = user.address.findIndex(
       (addr) => addr._id && addr._id.toString() === addressId
     );
-
+    
     // 2. Nếu không tìm thấy, thử tìm bằng ObjectId trực tiếp
     if (addressIndex === -1) {
       try {
@@ -191,18 +186,16 @@ exports.removeAddress = async (req, res) => {
         console.log("Error converting to ObjectId:", err.message);
       }
     }
-
+    
     // 3. Nếu vẫn không tìm thấy, thử tìm theo cả nội dung địa chỉ
     if (addressIndex === -1) {
       // Lấy tất cả các ID địa chỉ để ghi log
-      const availableIds = user.address.map((addr) => addr._id?.toString());
-      console.log("Available IDs:", availableIds.join(","));
+      const availableIds = user.address.map(addr => addr._id?.toString());
+      console.log("Available IDs:", availableIds);
       console.log("Looking for ID similar to:", addressId);
-
+      
       // Tìm ID gần giống
-      const similarIds = availableIds.filter(
-        (id) => id && id.includes(addressId.substring(0, 8))
-      );
+      const similarIds = availableIds.filter(id => id && id.includes(addressId.substring(0, 8)));
       if (similarIds.length > 0) {
         console.log("Found similar IDs:", similarIds);
         // Tìm địa chỉ với ID gần giống nhất
@@ -212,41 +205,11 @@ exports.removeAddress = async (req, res) => {
       }
     }
 
-    // 4. Tìm theo nội dung địa chỉ - trường hợp cuối cùng là xóa dựa trên nội dung
-    if (addressIndex === -1) {
-      const foundAddress = user.address.find(
-        (addr) => addr.address && addr.address.includes(addressId)
-      );
-
-      if (foundAddress) {
-        console.log("Found address by content:", foundAddress);
-        addressIndex = user.address.findIndex(
-          (addr) =>
-            addr._id && addr._id.toString() === foundAddress._id.toString()
-        );
-      }
-    }
-
-    // 5. Giải pháp cuối cùng - tìm bằng giá trị index nếu có vẻ như là một số
-    if (addressIndex === -1 && !isNaN(parseInt(addressId))) {
-      const index = parseInt(addressId);
-      if (index >= 0 && index < user.address.length) {
-        console.log(
-          `Using index-based approach, treating ${addressId} as index ${index}`
-        );
-        addressIndex = index;
-      }
-    }
-
     console.log(`Address index found: ${addressIndex}`);
 
     if (addressIndex === -1) {
       console.log(`Address with ID ${addressId} not found in user's addresses`);
-      console.log(
-        `Address IDs available: ${user.address
-          .map((addr) => (addr._id ? addr._id.toString() : "undefined"))
-          .join(",")}`
-      );
+      console.log(`Address IDs available: ${user.address.map(addr => addr._id ? addr._id.toString() : 'undefined')}`);
       return res.status(404).json({ message: "Address not found" });
     }
 
@@ -256,17 +219,15 @@ exports.removeAddress = async (req, res) => {
 
     // Xóa địa chỉ khỏi mảng address
     user.address.splice(addressIndex, 1);
-    console.log(
-      `Address removed from array. New addresses length: ${user.address.length}`
-    );
+    console.log(`Address removed from array. New addresses length: ${user.address.length}`);
 
     // Lưu người dùng
     await user.save();
     console.log("User saved successfully after removing address");
 
-    res.status(200).json({
+    res.status(200).json({ 
       message: "Address removed successfully",
-      removedAddress: addressToRemove,
+      removedAddress: addressToRemove
     });
   } catch (error) {
     console.error("Error removing address:", error);

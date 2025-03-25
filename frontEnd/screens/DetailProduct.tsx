@@ -21,22 +21,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 
-// Định nghĩa types
-type RootStackParamList = {
-  HomePage: undefined;
-  DetailProduct: { productId: string };
-  CartScreen: { userId: string };
-  Login: undefined;
-};
-
-type DetailProductScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "DetailProduct"
->;
-type DetailProductScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "DetailProduct"
->;
+// Định nghĩa types cho các component khác không thay đổi
+type DetailProductScreenNavigationProp = StackNavigationProp<ReactNavigation.RootParamList, 'DetailProduct'>;
+type DetailProductScreenRouteProp = RouteProp<ReactNavigation.RootParamList, 'DetailProduct'>;
 
 interface Review {
   id: string;

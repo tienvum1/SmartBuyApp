@@ -8,6 +8,8 @@ const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const stripeRoutes = require("./routes/stripeRoutes");
+const bodyParser = require("body-parser");
 
 dotenv.config();
 
@@ -17,6 +19,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/uploads", express.static("uploads")); // Cho phép truy cập ảnh trong thư mục uploads
+
+// Middleware đặc biệt cho webhook của Stripe
+app.use("/stripe/webhook", bodyParser.raw({ type: "application/json" }));
 
 // Kết nối MongoDB
 mongoose
@@ -34,6 +39,7 @@ app.use("/products", productRoutes);
 app.use("/carts", cartRoutes);
 app.use("/checkouts", checkoutRoutes);
 app.use("/wishlists", wishlistRoutes);
+app.use("/stripe", stripeRoutes);
 
 // Direct route for removeAddress
 app.delete("/removeAddress/:userId/:addressId", async (req, res) => {

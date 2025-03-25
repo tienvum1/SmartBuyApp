@@ -10,6 +10,8 @@ import {
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 interface CartItem {
   _id: string;
@@ -27,15 +29,15 @@ interface Address {
   is_primary?: boolean;
 }
 
-interface CheckoutDetailScreenProps {
-  navigation: any;
-  route: { params: { selectedItems: CartItem[]; total: number } };
-}
+type CheckoutDetailScreenRouteProp = RouteProp<ReactNavigation.RootParamList, 'CheckoutDetailScreen'>;
+type CheckoutDetailScreenNavigationProp = StackNavigationProp<ReactNavigation.RootParamList, 'CheckoutDetailScreen'>;
 
-const CheckoutDetailScreen: React.FC<CheckoutDetailScreenProps> = ({
-  navigation,
-  route,
-}) => {
+type Props = {
+  navigation: CheckoutDetailScreenNavigationProp;
+  route: CheckoutDetailScreenRouteProp;
+};
+
+const CheckoutDetailScreen = ({ navigation, route }: Props) => {
   const { selectedItems, total } = route.params;
   const [items] = useState<CartItem[]>(selectedItems);
   const [totals] = useState<number>(total);
@@ -184,6 +186,19 @@ const CheckoutDetailScreen: React.FC<CheckoutDetailScreenProps> = ({
         >
           <Text style={styles.optionValue}>Cash on Delivery</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[
+            styles.option,
+            selectedPayment === "stripe" && styles.selectedOption,
+          ]}
+          onPress={() => setSelectedPayment("stripe")}
+        >
+          <View style={styles.paymentMethodRow}>
+            <Text style={styles.optionValue}>Pay with Stripe</Text>
+            <Text style={styles.paymentMethodDescription}>(Credit Card, Google Pay, Apple Pay)</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.summary}>
@@ -223,6 +238,15 @@ const CheckoutDetailScreen: React.FC<CheckoutDetailScreenProps> = ({
             }
             if (items.length === 0) {
               alert("Please select at least one item");
+              return;
+            }
+
+            if (selectedPayment === "stripe") {
+              navigation.navigate("StripePaymentScreen", {
+                amount: grandTotal,
+                shippingAddressId: selectedAddress._id,
+                selectedItemIds: items.map(item => item._id)
+              });
               return;
             }
 
@@ -455,6 +479,15 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  paymentMethodRow: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  paymentMethodDescription: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });
 
