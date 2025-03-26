@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+
+// Import routes
 const brandRoutes = require("./routes/brandRoutes");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -9,7 +12,6 @@ const cartRoutes = require("./routes/cartRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const stripeRoutes = require("./routes/stripeRoutes");
-const bodyParser = require("body-parser");
 
 dotenv.config();
 

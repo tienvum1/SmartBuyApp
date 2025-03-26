@@ -76,21 +76,27 @@ const CheckoutDetailScreen = ({ navigation, route }: Props) => {
         setUserId(userId);
         console.log("CheckoutDetailScreen - Using userId:", userId);
 
-        const addressResponse = await axios.get(
-          `http://10.0.2.2:5001/users/getAllAddresses/${userId}`
-        );
-        console.log("API Response:", addressResponse.data);
+        try {
+          const addressResponse = await axios.get(
+            `http://10.0.2.2:5001/users/getAllAddresses/${userId}`
+          );
+          console.log("API Response:", addressResponse.data);
 
-        const fetchedAddresses = addressResponse.data.addresses || [];
-        console.log("Fetched Addresses:", fetchedAddresses);
+          const fetchedAddresses = addressResponse.data.addresses || [];
+          console.log("Fetched Addresses:", fetchedAddresses);
 
-        setAddresses(fetchedAddresses);
-        const primaryAddress = fetchedAddresses.find(
-          (addr: Address) => addr.is_primary
-        );
-        setSelectedAddress(primaryAddress || null); // Mặc định chọn địa chỉ chính
+          setAddresses(fetchedAddresses);
+          const primaryAddress = fetchedAddresses.find(
+            (addr: Address) => addr.is_primary
+          );
+          setSelectedAddress(primaryAddress || null); // Mặc định chọn địa chỉ chính
+        } catch (addressError) {
+          console.error("Error fetching addresses from API:", addressError);
+          // Nếu không thể lấy địa chỉ từ API, hiển thị thông báo
+          alert("Could not load addresses. Please check your connection and try again.");
+        }
       } catch (error) {
-        console.error("Error fetching addresses:", error);
+        console.error("Error in fetchAddressesAndSetTotal:", error);
         setAddresses([]);
         setUserId(null);
       } finally {
@@ -242,10 +248,18 @@ const CheckoutDetailScreen = ({ navigation, route }: Props) => {
             const userString = await AsyncStorage.getItem("user");
             const user = JSON.parse(userString || "{}");
             const userId = user._id;
+            
+            console.log("User ID before order:", userId);
+            console.log("User ID type:", typeof userId);
+            
             if (!selectedAddress) {
               alert("Please select a shipping address");
               return;
             }
+            
+            console.log("Selected Address ID:", selectedAddress._id);
+            console.log("Selected Address ID type:", typeof selectedAddress._id);
+            
             if (items.length === 0) {
               alert("Please select at least one item");
               return;
@@ -270,21 +284,29 @@ const CheckoutDetailScreen = ({ navigation, route }: Props) => {
               userId: userId,
             });
 
-            const response = await axios.post(
-              "http://10.0.2.2:5001/checkouts/placeOrder",
-              {
-                shippingAddressId: selectedAddress._id,
-                paymentMethod: selectedPayment,
-                selectedItemIds,
-                total: grandTotal,
-                userId: userId,
-              }
-            );
+            try {
+              const response = await axios.post(
+                "http://10.0.2.2:5001/checkouts/placeOrder",
+                {
+                  shippingAddressId: selectedAddress._id,
+                  paymentMethod: selectedPayment,
+                  selectedItemIds,
+                  total: grandTotal,
+                  userId: userId,
+                }
+              );
 
-            if (response.data.success) {
-              navigation.navigate("OrderSuccessScreen");
-            } else {
-              alert(response.data.message || "Failed to place order");
+              if (response.data.success) {
+                navigation.navigate("OrderSuccessScreen");
+              } else {
+                console.error("Server returned error:", response.data);
+                alert(response.data.message || "Failed to place order");
+              }
+            } catch (apiError: any) {
+              console.error("API Error:", apiError);
+              const errorMessage = apiError.response?.data?.message || apiError.response?.data?.error || apiError.message;
+              console.error("Error details:", errorMessage);
+              alert(`Failed to place order: ${errorMessage}`);
             }
           } catch (error) {
             console.error("Error placing order:", error);

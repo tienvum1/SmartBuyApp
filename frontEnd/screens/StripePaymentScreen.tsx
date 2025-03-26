@@ -46,7 +46,7 @@ const StripePaymentScreen = ({ navigation, route }: Props) => {
       console.log('Fetching payment intent for amount:', amount);
       
       // Gọi API để tạo Payment Intent và lấy client secret
-      const response = await axios.post('http://192.168.1.28:5001/stripe/create-payment-intent', {
+      const response = await axios.post('http://10.0.2.2:5001/stripe/create-payment-intent', {
         amount, // Số tiền cần thanh toán
         currency: 'vnd', // Đơn vị tiền tệ
         description: `Đơn hàng SmartBuy - ${new Date().toISOString()}`,
@@ -74,7 +74,7 @@ const StripePaymentScreen = ({ navigation, route }: Props) => {
       console.log('Initializing payment sheet...');
       
       // Lấy publishable key từ backend
-      const configResponse = await axios.get('http://192.168.1.28:5001/stripe/config');
+      const configResponse = await axios.get('http://10.0.2.2:5001/stripe/config');
       console.log('Config response:', configResponse.data);
       
       const { publishableKey } = configResponse.data;
@@ -154,7 +154,7 @@ const StripePaymentScreen = ({ navigation, route }: Props) => {
       console.log('Confirming payment with ID:', paymentIntentId);
       
       // Kiểm tra trạng thái thanh toán
-      const paymentResponse = await axios.post('http://192.168.1.28:5001/stripe/confirm-payment', {
+      const paymentResponse = await axios.post('http://10.0.2.2:5001/stripe/confirm-payment', {
         paymentIntentId
       });
 
@@ -175,7 +175,7 @@ const StripePaymentScreen = ({ navigation, route }: Props) => {
         
         console.log('Order data:', orderData);
         
-        const orderResponse = await axios.post('http://192.168.1.28:5001/checkouts/placeOrder', orderData);
+        const orderResponse = await axios.post('http://10.0.2.2:5001/checkouts/placeOrder', orderData);
 
         console.log('Order response:', orderResponse.data);
 

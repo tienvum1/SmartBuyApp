@@ -20,7 +20,6 @@ import {
 } from "react-native";
 import SearchProductComponent from "../components/SearchProductComponent";
 import ProductItem from "../components/ProductItem";
-import { LinearGradient } from "expo-linear-gradient";
 import BottomNavigationBar from "../components/BottomNavigationBar";
 
 // Định nghĩa type
@@ -178,13 +177,15 @@ const ProductScreen = ({
       }
       
       if (response.data && response.data.products) {
-        // Tạo set mới từ danh sách sản phẩm yêu thích
-        const wishlistProductIds = new Set(
+        // Tạo set mới từ danh sách sản phẩm yêu thích với chỉ định kiểu Set<string> rõ ràng
+        const wishlistProductIds: Set<string> = new Set(
           response.data.products.map((item: any) => {
             // Xử lý cả hai trường hợp: item.product_id là object hoặc string
-            return typeof item.product_id === 'object' 
+            const productId = typeof item.product_id === 'object' 
               ? item.product_id._id 
               : item.product_id;
+            // Đảm bảo rằng productId là string
+            return String(productId);
           })
         );
         

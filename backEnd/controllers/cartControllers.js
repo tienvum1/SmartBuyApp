@@ -23,6 +23,12 @@ exports.addToCart = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    if (quantity > product.stock) {
+      return res.status(400).json({
+        message: `Cannot add more than available stock. Available: ${product.stock}, Requested: ${quantity}`
+      });
+    }
+
     let cart = await Cart.findOne({ user_id });
     if (!cart) {
       cart = new Cart({
@@ -57,8 +63,15 @@ exports.addToCart = async (req, res) => {
     );
 
     if (existingItemIndex > -1) {
-      cart.items[existingItemIndex].quantity += quantity;
-      cart.items[existingItemIndex].subtotal += subtotal;
+      const newQuantity = cart.items[existingItemIndex].quantity + quantity;
+      if (newQuantity > product.stock) {
+        return res.status(400).json({
+          message: `Cannot add more than available stock. Available: ${product.stock}, Current in cart: ${cart.items[existingItemIndex].quantity}, Requested to add: ${quantity}`
+        });
+      }
+      
+      cart.items[existingItemIndex].quantity = newQuantity;
+      cart.items[existingItemIndex].subtotal = price * newQuantity;
     } else {
       cart.items.push({
         product_id,
@@ -111,6 +124,19 @@ exports.updateCartItem = async (req, res) => {
     const item = cart.items.id(item_id);
     if (!item) {
       return res.status(404).json({ message: "Item not found in cart" });
+    }
+
+    // Lấy thông tin sản phẩm để kiểm tra số lượng tồn kho
+    const product = await Product.findById(item.product_id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Kiểm tra nếu số lượng mới vượt quá số lượng trong kho
+    if (quantity > product.stock) {
+      return res.status(400).json({
+        message: `Cannot update to more than available stock. Available: ${product.stock}, Requested: ${quantity}`
+      });
     }
 
     item.quantity = quantity;

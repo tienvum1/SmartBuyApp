@@ -3,13 +3,15 @@ const User = require("../models/User");
 const Cart = require("../models/Cart");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
 
 // Place order (COD and Stripe) - Đã cập nhật để hỗ trợ Stripe
 exports.placeOrder = async (req, res) => {
   try {
     const { shippingAddressId, paymentMethod, selectedItemIds, total, userId, paymentIntentId } =
       req.body;
-    console.log(req.body);
+    console.log("--- Bắt đầu xử lý placeOrder ---");
+    console.log("Request body:", req.body);
     console.log("User ID from placeOrder:", userId);
     console.log("Thông tin đầu vào:", {
       shippingAddressId,
@@ -19,6 +21,34 @@ exports.placeOrder = async (req, res) => {
       paymentIntentId
     });
 
+    // Kiểm tra xem userId có phải là ObjectId hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("userId không phải là ObjectId hợp lệ:", userId);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format"
+      });
+    }
+
+    // Kiểm tra xem shippingAddressId có phải là ObjectId hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(shippingAddressId)) {
+      console.error("shippingAddressId không phải là ObjectId hợp lệ:", shippingAddressId);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid shipping address ID format"
+      });
+    }
+
+    // Kiểm tra xem selectedItemIds có phải là mảng các ObjectId hợp lệ không
+    const invalidItemIds = selectedItemIds.filter(id => !mongoose.Types.ObjectId.isValid(id));
+    if (invalidItemIds.length > 0) {
+      console.error("Có các item ID không hợp lệ:", invalidItemIds);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid item ID format in selectedItemIds"
+      });
+    }
+
     if (
       !shippingAddressId ||
       !paymentMethod ||
@@ -26,6 +56,13 @@ exports.placeOrder = async (req, res) => {
       !total ||
       !userId
     ) {
+      console.error("Thiếu thông tin bắt buộc:", {
+        hasShippingAddressId: !!shippingAddressId,
+        hasPaymentMethod: !!paymentMethod,
+        hasSelectedItemIds: !!selectedItemIds && selectedItemIds.length > 0,
+        hasTotal: !!total,
+        hasUserId: !!userId
+      });
       return res.status(400).json({
         success: false,
         message:
@@ -36,6 +73,7 @@ exports.placeOrder = async (req, res) => {
 
     // Kiểm tra phương thức thanh toán hợp lệ
     if (paymentMethod !== "cod" && paymentMethod !== "stripe") {
+      console.error("Phương thức thanh toán không hợp lệ:", paymentMethod);
       return res.status(400).json({
         success: false,
         message: "Only 'cod' and 'stripe' payment methods are supported",
@@ -44,6 +82,7 @@ exports.placeOrder = async (req, res) => {
 
     // Nếu thanh toán qua Stripe, cần paymentIntentId
     if (paymentMethod === "stripe" && !paymentIntentId) {
+      console.error("Thanh toán qua Stripe nhưng không có paymentIntentId");
       return res.status(400).json({
         success: false,
         message: "PaymentIntentId is required for Stripe payments",
@@ -54,13 +93,22 @@ exports.placeOrder = async (req, res) => {
     const cart = await Cart.findOne({ user_id: userId }).populate(
       "items.product_id"
     );
-    console.log("Kết quả tìm giỏ hàng:", cart);
+    console.log("Kết quả tìm giỏ hàng:", cart ? "Tìm thấy giỏ hàng" : "Không tìm thấy giỏ hàng");
     if (!cart) {
+      console.error("Không tìm thấy giỏ hàng cho user:", userId);
       return res
         .status(404)
         .json({ success: false, message: "Cart not found" });
     }
-    console.log("Giỏ hàng hợp lệ:", cart);
+    
+    // Kiểm tra có items trong giỏ hàng không
+    if (!cart.items || cart.items.length === 0) {
+      console.error("Giỏ hàng rỗng cho user:", userId);
+      return res
+        .status(400)
+        .json({ success: false, message: "Cart is empty" });
+    }
+    console.log("Giỏ hàng hợp lệ, có", cart.items.length, "sản phẩm");
 
     console.log("Bắt đầu tìm user với userId:", userId);
     const user = await User.findById(userId);

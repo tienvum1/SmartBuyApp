@@ -178,6 +178,15 @@ const DetailProduct: React.FC<DetailProductProps> = ({ navigation, route }) => {
         return;
       }
 
+      // Kiểm tra số lượng tồn kho
+      if (product && quantity > product.stock) {
+        Alert.alert(
+          "Error", 
+          `Cannot add more than available stock. Available: ${product.stock}, Requested: ${quantity}`
+        );
+        return;
+      }
+
       const response = await axios.post("http://10.0.2.2:5001/carts/add", {
         user_id: userId,
         product_id: productId,
@@ -190,7 +199,13 @@ const DetailProduct: React.FC<DetailProductProps> = ({ navigation, route }) => {
       navigation.navigate("CartScreen", { userId });
     } catch (error) {
       console.error("Error adding to cart:", error);
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        // Hiển thị lỗi từ server (ví dụ: vượt quá số lượng trong kho)
+        Alert.alert(
+          "Error",
+          error.response.data.message || "Failed to add product to cart"
+        );
+      } else if (axios.isAxiosError(error) && error.response?.status === 404) {
         Alert.alert(
           "Error",
           "Cart endpoint not found. Please check your server."
@@ -296,11 +311,22 @@ const DetailProduct: React.FC<DetailProductProps> = ({ navigation, route }) => {
   // Render quantity selector
   const renderQuantitySelector = () => (
     <View style={styles.quantitySection}>
-      <Text style={styles.quantityLabel}>Quantity</Text>
+      <View style={styles.quantityHeader}>
+        <Text style={styles.quantityLabel}>Quantity</Text>
+        <Text style={styles.stockInfo}>
+          {product.stock > 0 
+            ? `${product.stock} in stock` 
+            : "Out of stock"}
+        </Text>
+      </View>
       <View style={styles.quantityContainer}>
         <TouchableOpacity
-          style={styles.quantityButton}
+          style={[
+            styles.quantityButton,
+            quantity <= 1 && styles.disabledButton
+          ]}
           onPress={() => setQuantity(Math.max(1, quantity - 1))}
+          disabled={quantity <= 1}
         >
           <Text style={styles.quantityButtonText}>-</Text>
         </TouchableOpacity>
@@ -312,8 +338,12 @@ const DetailProduct: React.FC<DetailProductProps> = ({ navigation, route }) => {
           maxLength={3}
         />
         <TouchableOpacity
-          style={styles.quantityButton}
+          style={[
+            styles.quantityButton,
+            quantity >= product.stock && styles.disabledButton
+          ]}
           onPress={() => setQuantity(Math.min(product.stock, quantity + 1))}
+          disabled={quantity >= product.stock}
         >
           <Text style={styles.quantityButtonText}>+</Text>
         </TouchableOpacity>
@@ -625,6 +655,18 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontMedium,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  quantityHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  stockInfo: {
+    fontSize: SIZES.fontSmall,
+    color: COLORS.gray,
+  },
+  disabledButton: {
+    backgroundColor: COLORS.gray,
   },
 });
 

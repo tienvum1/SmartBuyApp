@@ -42,7 +42,7 @@ export default function App() {
 
   const fetchPublishableKey = async () => {
     try {
-      const response = await axios.get('http://192.168.1.28:5001/stripe/config');
+      const response = await axios.get('http://10.0.2.2:5001/stripe/config');
       const key = response.data.publishableKey;
       if (key) {
         setPublishableKey(key);
