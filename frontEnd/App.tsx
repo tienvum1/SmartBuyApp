@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { StripeProvider } from '@stripe/stripe-react-native';
-import axios from 'axios';
 
 import SplashScreen from "./login/SplashScreen";
 import SignInScreen from "./login/SignInScreen";
@@ -27,73 +25,46 @@ import WishListScreen from "./screens/WishListScreen";
 import OrderSuccessScreen from "./screens/OrderSuccessScreen";
 import AddAddressScreen from "./screens/AddAddressScreen";
 import AllAddressScreen from "./screens/AllAddressScreen";
-import StripePaymentScreen from "./screens/StripePaymentScreen";
 
-// Khai báo Stack Navigator không cần chỉ định kiểu
 const Stack = createStackNavigator();
 
 export default function App() {
-  const [publishableKey, setPublishableKey] = useState('');
-
-  // Lấy Stripe publishable key khi ứng dụng khởi động
-  useEffect(() => {
-    fetchPublishableKey();
-  }, []);
-
-  const fetchPublishableKey = async () => {
-    try {
-      const response = await axios.get('http://10.0.2.2:5001/stripe/config');
-      const key = response.data.publishableKey;
-      if (key) {
-        setPublishableKey(key);
-      }
-    } catch (error) {
-      console.error("Không thể lấy Stripe publishable key:", error);
-    }
-  };
-
   return (
-    <StripeProvider
-      publishableKey={publishableKey}
-      merchantIdentifier="merchant.com.smartbuy.app"
-    >
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Splash" component={SplashScreen as any} />
-          <Stack.Screen name="SignIn" component={SignInScreen as any} />
-          <Stack.Screen name="SignUp" component={SignUpScreen as any} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen as any} />
-          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen as any} />
-          <Stack.Screen name="HomePage" component={HomePage as any} />
-          <Stack.Screen name="CategoryScreen" component={CategoryScreen as any} />
-          <Stack.Screen name="ProductScreen" component={ProductScreen as any} />
-          <Stack.Screen name="DetailProduct" component={DetailProduct as any} />
-          <Stack.Screen
-            name="NotificationScreen"
-            component={NotificationScreen as any}
-          />
-          <Stack.Screen name="OrderScreen" component={OrderScreen as any} />
-          <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen as any} />
-          <Stack.Screen name="ProfileScreen" component={ProfileScreen as any} />
-          <Stack.Screen name="EditProfileScreen" component={EditProfileScreen as any} />
-          <Stack.Screen name="PaymentScreen" component={PaymentScreen as any} />
-          <Stack.Screen name="AddCardScreen" component={AddCardScreen as any} />
-          <Stack.Screen name="HelpScreen" component={HelpScreen as any} />
-          <Stack.Screen name="CartScreen" component={CartScreen as any} />
-          <Stack.Screen
-            name="CheckoutDetailScreen"
-            component={CheckoutDetailScreen as any}
-          />
-          <Stack.Screen name="WishListScreen" component={WishListScreen as any} />
-          <Stack.Screen
-            name="OrderSuccessScreen"
-            component={OrderSuccessScreen as any}
-          />
-          <Stack.Screen name="AddAddressScreen" component={AddAddressScreen as any} />
-          <Stack.Screen name="AllAddressScreen" component={AllAddressScreen as any} />
-          <Stack.Screen name="StripePaymentScreen" component={StripePaymentScreen as any} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </StripeProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="HomePage" component={HomePage} />
+        <Stack.Screen name="CategoryScreen" component={CategoryScreen} />
+        <Stack.Screen name="ProductScreen" component={ProductScreen} />
+        <Stack.Screen name="DetailProduct" component={DetailProduct} />
+        <Stack.Screen
+          name="NotificationScreen"
+          component={NotificationScreen}
+        />
+        <Stack.Screen name="OrderScreen" component={OrderScreen} />
+        <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+        <Stack.Screen name="AddCardScreen" component={AddCardScreen} />
+        <Stack.Screen name="HelpScreen" component={HelpScreen} />
+        <Stack.Screen name="CartScreen" component={CartScreen} />
+        <Stack.Screen
+          name="CheckoutDetailScreen"
+          component={CheckoutDetailScreen}
+        />
+        <Stack.Screen name="WishListScreen" component={WishListScreen} />
+        <Stack.Screen
+          name="OrderSuccessScreen"
+          component={OrderSuccessScreen}
+        />
+        <Stack.Screen name="AddAddressScreen" component={AddAddressScreen} />
+        <Stack.Screen name="AllAddressScreen" component={AllAddressScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

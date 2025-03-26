@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { Ionicons } from "@expo/vector-icons";
+
 // Định nghĩa type cho Address
 type Address = {
   address: string;
@@ -268,9 +268,6 @@ const AllAddressesScreen: React.FC<AllAddressesScreenProps> = ({
     <View style={styles.container}>
       {/* Tiêu đề và nút thêm địa chỉ */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("OrderScreen")}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
-        </TouchableOpacity>
         <Text style={styles.title}>Danh sách địa chỉ</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("AddAddressScreen")}

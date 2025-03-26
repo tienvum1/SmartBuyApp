@@ -28,7 +28,7 @@ const SignInScreen = ({ navigation }: { navigation: any }) => {
         email,
         password,
       });
-      console.log(response);
+
       if (response.status === 200) {
         const { token, user } = response.data; // Giả sử API trả về token và thông tin user
 

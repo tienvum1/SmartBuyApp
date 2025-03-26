@@ -70,6 +70,27 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    try {
+      const response = await fetch("http://localhost:5001/users/forgotPass", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Success", "Check your email for the reset code.");
+        navigation.navigate("ResetPassword");
+      } else {
+        Alert.alert("Error", "Failed to send reset email.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An error occurred. Please try again.");
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -139,10 +160,10 @@ export default ForgotPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Chiếm toàn bộ chiều cao của màn hình
-    justifyContent: "flex-start", // Đưa nội dung lên phía trên
-    alignItems: "flex-start", // Căn nội dung về bên trái màn hình
-    paddingHorizontal: 30, // Khoảng cách hai bên lề là 30px
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    paddingHorizontal: 30,
     backgroundColor: "#FFF",
     width: "100%",
   },

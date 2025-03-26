@@ -1,9 +1,5 @@
 {
   "expo": {
-    "facebookAppId": "4472200223006747",
-    "facebookDisplayName": "dddddd",
-    "facebookScheme": "fb4472200223006747",
-    "facebookAutoInitEnabled": false,
     "name": "frontEnd",
     "slug": "frontEnd",
     "version": "1.0.0",
@@ -23,8 +19,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.anonymous.frontEnd"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -407,8 +407,17 @@ const OrdersScreen = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTitle}>My Orders</Text>
-
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>My Orders</Text>
+        <TouchableOpacity
+          onPress={() => fetchOrders(selectedStatus || undefined)}
+        >
+          <Ionicons name="refresh" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
       {renderStatusFilter()}
       {loading ? (
         <ActivityIndicator size="large" color="#8E6CEF" />
@@ -453,11 +462,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   headerTitle: {
-    marginTop: 50,
-    marginBottom: 20,
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "center",
   },
   filterContainer: {
     flexDirection: "row",
