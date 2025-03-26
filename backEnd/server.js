@@ -16,12 +16,19 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(express.json());
 app.use(cors());
-app.use("/uploads", express.static("uploads")); // Cho phép truy cập ảnh trong thư mục uploads
 
-// Middleware đặc biệt cho webhook của Stripe
-app.use("/stripe/webhook", bodyParser.raw({ type: "application/json" }));
+// Middleware cho Stripe webhook - phải đặt trước middleware xử lý JSON thông thường
+// Stripe webhook cần raw body
+app.use((req, res, next) => {
+  if (req.originalUrl === '/stripe/webhook') {
+    bodyParser.raw({ type: 'application/json' })(req, res, next);
+  } else {
+    express.json()(req, res, next);
+  }
+});
+
+app.use("/uploads", express.static("uploads")); // Cho phép truy cập ảnh trong thư mục uploads
 
 // Kết nối MongoDB
 mongoose

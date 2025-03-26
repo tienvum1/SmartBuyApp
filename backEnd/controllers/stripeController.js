@@ -1,4 +1,5 @@
-const stripe = require('stripe')('sk_test_51R6XByKCyDrCcWwNZkA6QexXOKXe47ImvOBPbVFFqZj27l4P9WLqzsj0n7vx52fVq7lKUIhGPQSueSDS9Q9w03MS008YLJol0X');
+// Đảm bảo sử dụng API key từ biến môi trường hoặc sử dụng giá trị hardcode nếu không có
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51R6XByKCyDrCcWwNZkA6QexXOKXe47ImvOBPbVFFqZj27l4P9WLqzsj0n7vx52fVq7lKUIhGPQSueSDS9Q9w03MS008YLJol0X');
 
 /**
  * Tạo Payment Intent cho giao dịch thanh toán
@@ -38,9 +39,14 @@ exports.createPaymentIntent = async (req, res) => {
  */
 exports.getConfig = (req, res) => {
   try {
+    // Đảm bảo publishable key luôn được trả về
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_51R6XByKCyDrCcWwNNeiUs6XUy1qbBxLaB78ny3S3p588CVH203sqyjXSuN8iTCbUaacodTIjHQfLIs1DrqvEJ1zv00B9OXzQsn';
+    
+    console.log('Sending publishable key:', publishableKey);
+    
     res.status(200).json({
       success: true,
-      publishableKey: 'pk_test_51R6XByKCyDrCcWwNNeiUs6XUy1qbBxLaB78ny3S3p588CVH203sqyjXSuN8iTCbUaacodTIjHQfLIs1DrqvEJ1zv00B9OXzQsn',
+      publishableKey
     });
   } catch (error) {
     console.error('Error getting Stripe config:', error);
@@ -60,11 +66,14 @@ exports.webhook = async (req, res) => {
   let event;
 
   try {
-    // Xác minh sự kiện đến từ Stripe
+    // Sử dụng webhook secret từ biến môi trường hoặc giá trị mặc định
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_e4f3ba9b4d1c6df5f2c2a0d9e93ccf7b9e2f7b3a1d8c0f4e6b5a2d1c3b4a5f6';
+    
+    // Xác minh sự kiện đến từ Stripe sử dụng webhook secret từ biến môi trường
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      'whsec_your_webhook_secret' // Webhook Secret trực tiếp
+      webhookSecret
     );
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);

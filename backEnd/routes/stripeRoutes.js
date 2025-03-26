@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const stripeController = require('../controllers/stripeController');
-const bodyParser = require('body-parser');
 
 // Route để lấy cấu hình Stripe (publishable key)
 router.get('/config', stripeController.getConfig);
@@ -12,11 +11,8 @@ router.post('/create-payment-intent', stripeController.createPaymentIntent);
 // Route để xác nhận thanh toán
 router.post('/confirm-payment', stripeController.confirmPayment);
 
-// Route để xử lý webhook (sử dụng raw body)
-router.post(
-  '/webhook',
-  bodyParser.raw({ type: 'application/json' }),
-  stripeController.webhook
-);
+// Route để xử lý webhook 
+// Lưu ý: bodyParser.raw đã được áp dụng trong server.js
+router.post('/webhook', stripeController.webhook);
 
 module.exports = router; 
